@@ -1,0 +1,94 @@
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = MiniVisorDxe
+  FILE_GUID                      = 503682AC-F01E-4D10-AAE3-BE5A90A563E7
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DriverEntry
+  UNLOAD_IMAGE                   = DriverUnload
+
+[Sources]
+  ../../../Sources/Platform/EFI/EfiAsm.asm
+  ../../../Sources/Platform/EFI/EfiAsm.h
+  ../../../Sources/Platform/EFI/EfiBitmap.c
+  ../../../Sources/Platform/EFI/EfiBitmap.h
+  ../../../Sources/Platform/EFI/EfiCommon.h
+  ../../../Sources/Platform/EFI/EfiHostInitialization.c
+  ../../../Sources/Platform/EFI/EfiHostInitialization.h
+  ../../../Sources/Platform/EFI/EfiLogger.c
+  ../../../Sources/Platform/EFI/EfiLogger.h
+  ../../../Sources/Platform/EFI/EfiPlatform.c
+  ../../../Sources/Platform/EFI/EfiPlatform.h
+  ../../../Sources/ExtendedPageTables.c
+  ../../../Sources/ExtendedPageTables.h
+  ../../../Sources/HostMain.c
+  ../../../Sources/HostMain.h
+ #../../../Sources/HostNesting.c
+  ../../../Sources/HostNesting.h
+  ../../../Sources/HostUtils.c
+  ../../../Sources/HostUtils.h
+  ../../../Sources/HostVmcall.c
+  ../../../Sources/HostVmcall.h
+  ../../../Sources/Logger.h
+  ../../../Sources/MemoryAccess.c
+  ../../../Sources/MemoryAccess.h
+  ../../../Sources/MemoryManager.c
+  ../../../Sources/MemoryManager.h
+  ../../../Sources/MemoryType.c
+  ../../../Sources/MemoryType.h
+  ../../../Sources/MiniVisor.c
+  ../../../Sources/MiniVisor.h
+  ../../../Sources/Platform.h
+  ../../../Sources/Utils.c
+  ../../../Sources/Utils.h
+  ../../../Sources/Ia32.h
+  ../../../Sources/Asm.asm
+  ../../../Sources/Asm.h
+  ../../../Sources/Common.h
+  ../../../Sources/ia32-doc/out/ia32.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MiniVisorPkg/Builds/Platform/EFI/MiniVisorPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  DevicePathLib
+  SynchronizationLib
+  MemoryAllocationLib
+  PrintLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                      ## CONSUMES
+  gEfiMpServiceProtocolGuid                        ## CONSUMES
+
+[Guids]
+  gEfiEventExitBootServicesGuid                    ## CONSUMES
+  gEfiEventVirtualAddressChangeGuid                ## CONSUMES
+
+[Depex]
+  TRUE
+
+[BuildOptions.common.DXE_RUNTIME_DRIVER]
+  # Detect use of deprecated interfaces if any.
+  MSFT:*_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
+  # Remove DebugLib library instances (ASSERT and such) from the RELEASE binary.
+  # https://github.com/tianocore-docs/edk2-UefiDriverWritersGuide/blob/master/31_testing_and_debugging_uefi_drivers/314_debugging_code_statements/3141_configuring_debuglib_with_edk_ii.md
+  MSFT:RELEASE_*_*_CC_FLAGS = -D MDEPKG_NDEBUG
+
+  # EDK2 default defines /ALIGN:32, which is way too small for and causes link
+  # error. Reset to the default value.
+  MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096 /DEBUG
+
+  # By default, certain meta-data in the PE header is zeroed out to increase
+  # compression ratio. Some of those information can be helpful for a debugger,
+  # for example, to reconstruct stack trace. Leave it for such cases. See also,
+  # https://edk2-docs.gitbooks.io/edk-ii-basetools-user-guides/content/GenFw.html
+  MSFT:*_*_X64_GENFW_FLAGS = --keepexceptiontable --keepzeropending --keepoptionalheader
+
+  # Finally, note that the RELEASE build will generate excessively large binary
+  # file. To avoid this open the Conf/tools_def.txt, locate the below line,
+  #     RELEASE_VS2019_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4281 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
+  # then, remove "/MERGE:.rdata=.data".

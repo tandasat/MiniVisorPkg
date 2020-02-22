@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Platform">
+      <UniqueIdentifier>{e293d76d-1cb2-498e-865d-1408d410a323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform\Windows">
+      <UniqueIdentifier>{89b31625-554c-4a64-adb9-53d69633d23e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform\EFI">
+      <UniqueIdentifier>{0666652f-cc2f-4a3b-a0c5-0eb8b57f2ef5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform">
+      <UniqueIdentifier>{e9cab091-74b4-4aa0-b8ea-0526186a92ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\Windows">
+      <UniqueIdentifier>{377c4141-5e61-4508-ad18-231451501b85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\EFI">
+      <UniqueIdentifier>{39c270e1-5eba-4499-b137-e359597058c3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtendedPageTables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HostInitialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HostMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ia32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniVisor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Public.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HostVmcall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HostUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WinCommon.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\EFI\EfiCommon.h">
+      <Filter>Header Files\Platform\EFI</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\EFI\EfiAsm.h">
+      <Filter>Header Files\Platform\EFI</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WinAsm.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Asm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\EFI\EfiBitmap.h">
+      <Filter>Header Files\Platform\EFI</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\EFI\EfiLogger.h">
+      <Filter>Header Files\Platform\EFI</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WinLogger.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WinPlatform.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\EFI\EfiPlatform.h">
+      <Filter>Header Files\Platform\EFI</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\EFI\EfiHostInitialization.h">
+      <Filter>Header Files\Platform\EFI</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WinHostInitialization.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryAccess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HostNesting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ExtendedPageTables.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HostMain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManager.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryType.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniVisor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HostVmcall.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HostUtils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WinLogger.c">
+      <Filter>Source Files\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WinPlatform.c">
+      <Filter>Source Files\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\EFI\EfiPlatform.c">
+      <Filter>Source Files\Platform\EFI</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\EFI\EfiLogger.c">
+      <Filter>Source Files\Platform\EFI</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\EFI\EfiBitmap.c">
+      <Filter>Source Files\Platform\EFI</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\EFI\EfiHostInitialization.c">
+      <Filter>Source Files\Platform\EFI</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WinHostInitialization.c">
+      <Filter>Source Files\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryAccess.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="Asm.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="Platform\EFI\EfiAsm.asm">
+      <Filter>Source Files\Platform\EFI</Filter>
+    </MASM>
+    <MASM Include="Platform\Windows\WinAsm.asm">
+      <Filter>Source Files\Platform\Windows</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AsmCommon.inc">
+      <Filter>Header Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

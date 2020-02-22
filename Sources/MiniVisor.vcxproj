@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="UEFI|x64">
+      <Configuration>UEFI</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}</ProjectGuid>
+    <TemplateGuid>{dd38f7fc-d7bd-488b-9242-7d8754cde80d}</TemplateGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <Configuration>Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">Win32</Platform>
+    <RootNamespace>MiniVisor</RootNamespace>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <TargetVersion>Windows7</TargetVersion>
+    <UseDebugLibraries Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</UseDebugLibraries>
+    <UseDebugLibraries Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>WDM</DriverType>
+    <DriverTargetPlatform>Desktop</DriverTargetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='UEFI'">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <PropertyGroup Label="UserMacros">
+    <Edk2Dir>$(SolutionDir)..\..\</Edk2Dir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'!='UEFI'">
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <IncludePath>$(VC_IncludePath);$(IncludePath)</IncludePath>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='UEFI'">
+    <IncludePath>$(SolutionDir)Include;$(Edk2Dir)MdePkg\Include;$(Edk2Dir)MdePkg\Include\X64</IncludePath>
+    <LibraryPath>$(SolutionDir)Libs</LibraryPath>
+    <TargetExt>.efi</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='UEFI'">
+    <TargetName>$(ProjectName)Dxe</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>POOL_NX_OPTIN=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='UEFI'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <Optimization Condition="'$(Configuration)'=='UEFI'">Disabled</Optimization>
+      <OmitFramePointers Condition="'$(Configuration)'=='UEFI'">false</OmitFramePointers>
+      <WholeProgramOptimization Condition="'$(Configuration)'=='UEFI'">false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>EFI Runtime</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>BaseDebugLibSerialPort.lib;BaseDebugPrintErrorLevelLib.lib;BaseIoLibIntrinsicSev.lib;BaseLib.lib;BaseMemoryLibOptDxe.lib;BasePrintLib.lib;BaseSynchronizationLib.lib;BaseTimerLibNullTemplate.lib;DxePcdLib.lib;UefiBootServicesTableLib.lib;UefiDevicePathLibDevicePathProtocol.lib;UefiDriverEntryPoint.lib;UefiLib.lib;UefiMemoryAllocationLib.lib;UefiRuntimeServicesTableLib.lib;MiniVisorDxe.lib;PcAtSerialPortLib.lib</AdditionalDependencies>
+      <EntryPointSymbol>_ModuleEntryPoint</EntryPointSymbol>
+      <EnableUAC>false</EnableUAC>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+    </Link>
+    <PreLinkEvent>
+      <Command>python $(SolutionDir)PreLinkEvent.py $(Edk2Dir)Build\MiniVisor\NOOPT_VS2019\X64 $(SolutionDir)Libs</Command>
+    </PreLinkEvent>
+    <PostBuildEvent>
+      <Command Condition="'$(Configuration)'=='UEFI'">copy /y $(OutDir)$(TargetName)$(TargetExt) D:\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <FilesToPackage Include="$(TargetPath)" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="Asm.asm" />
+    <MASM Include="Platform\EFI\EfiAsm.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='UEFI'">true</ExcludedFromBuild>
+    </MASM>
+    <MASM Include="Platform\Windows\WinAsm.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='UEFI'">true</ExcludedFromBuild>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Asm.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="ExtendedPageTables.h" />
+    <ClInclude Include="HostNesting.h" />
+    <ClInclude Include="HostUtils.h" />
+    <ClInclude Include="HostInitialization.h" />
+    <ClInclude Include="HostMain.h" />
+    <ClInclude Include="HostVmcall.h" />
+    <ClInclude Include="Ia32.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="MemoryAccess.h" />
+    <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="MemoryType.h" />
+    <ClInclude Include="MiniVisor.h" />
+    <ClInclude Include="Platform.h" />
+    <ClInclude Include="Platform\EFI\EfiAsm.h" />
+    <ClInclude Include="Platform\EFI\EfiBitmap.h" />
+    <ClInclude Include="Platform\EFI\EfiCommon.h" />
+    <ClInclude Include="Platform\EFI\EfiHostInitialization.h" />
+    <ClInclude Include="Platform\EFI\EfiLogger.h" />
+    <ClInclude Include="Platform\EFI\EfiPlatform.h" />
+    <ClInclude Include="Platform\Windows\WinAsm.h" />
+    <ClInclude Include="Platform\Windows\WinCommon.h" />
+    <ClInclude Include="Platform\Windows\WinHostInitialization.h" />
+    <ClInclude Include="Platform\Windows\WinLogger.h" />
+    <ClInclude Include="Platform\Windows\WinPlatform.h" />
+    <ClInclude Include="Public.h" />
+    <ClInclude Include="Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ExtendedPageTables.c" />
+    <ClCompile Include="HostUtils.c" />
+    <ClCompile Include="HostMain.c" />
+    <ClCompile Include="HostVmcall.c" />
+    <ClCompile Include="MemoryAccess.c" />
+    <ClCompile Include="MemoryManager.c" />
+    <ClCompile Include="MemoryType.c" />
+    <ClCompile Include="MiniVisor.c" />
+    <ClCompile Include="Platform\EFI\EfiBitmap.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='UEFI'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Platform\EFI\EfiHostInitialization.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='UEFI'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Platform\EFI\EfiLogger.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='UEFI'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Platform\EFI\EfiPlatform.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='UEFI'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WinHostInitialization.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='UEFI'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WinLogger.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='UEFI'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WinPlatform.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='UEFI'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Utils.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AsmCommon.inc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

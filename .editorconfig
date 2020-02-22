@@ -1,0 +1,18 @@
+# This file how and what files are formatted with EditorConfig. The specified
+# formatting is applied when an user explicitly requires formatting with
+# [Edit] > [Advanced] > [Format Document] or makes changes in a file.
+#
+# To learn more about .editorconfig see https://aka.ms/editorconfigdocs
+
+# This is the top-level settings. EditorConfig will not look for further settings
+# in any parent directory that may override this settings unintentionally.
+root = true
+
+# All C and assembly files
+[*.{c,cpp,cc,cxx,h,hpp,rc,manifest,asm,nasm,s,inc}]
+charset = utf-8
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true

@@ -1,0 +1,51 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35DE61DD-9D91-4B1A-B082-8C80ED644749}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\LICENSE = ..\LICENSE
+		PreLinkEvent.py = PreLinkEvent.py
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniVisor", "..\Sources\MiniVisor.vcxproj", "{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platform", "Platform", "{3C22D872-3490-4292-A646-A6DFDA461CED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EFI", "EFI", "{278A0532-B8F9-4F76-AB0A-946AD377B07A}"
+	ProjectSection(SolutionItems) = preProject
+		Platform\EFI\locate_image_base.py = Platform\EFI\locate_image_base.py
+		Platform\EFI\MiniVisorDxe.inf = Platform\EFI\MiniVisorDxe.inf
+		Platform\EFI\MiniVisorPkg.dec = Platform\EFI\MiniVisorPkg.dec
+		Platform\EFI\MiniVisorPkg.dsc = Platform\EFI\MiniVisorPkg.dsc
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+		UEFI|x64 = UEFI|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}.Debug|x64.ActiveCfg = Debug|x64
+		{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}.Debug|x64.Build.0 = Debug|x64
+		{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}.Release|x64.ActiveCfg = Release|x64
+		{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}.Release|x64.Build.0 = Release|x64
+		{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}.UEFI|x64.ActiveCfg = UEFI|x64
+		{B94B175C-8D18-47E2-800C-1AFBAAC7AC73}.UEFI|x64.Build.0 = UEFI|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3C22D872-3490-4292-A646-A6DFDA461CED} = {35DE61DD-9D91-4B1A-B082-8C80ED644749}
+		{278A0532-B8F9-4F76-AB0A-946AD377B07A} = {3C22D872-3490-4292-A646-A6DFDA461CED}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF5CF53A-DB6B-415D-9F6C-135AFA73B8FB}
+	EndGlobalSection
+EndGlobal
