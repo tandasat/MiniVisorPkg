@@ -15,6 +15,9 @@ Showcase
 * Logging boot activities and interacting with the guest.
 ![Readme_Showcase2.jpg](Docs/Resources/Readme_Showcase2.jpg)
 
+* Booting Ubuntu on a bare-metal.
+![Readme_Showcase3.jpg](Docs/Resources/Readme_Showcase3.jpg)
+
 
 Motivation
 -----------
@@ -23,7 +26,7 @@ The goal of this project is to share an additional learning resource for writing
 
 There are numerous open source hypervisors with small and easy-to-study implementations, but those that support booting operating systems as UEFI drivers are still not many.
 
-Given the universality of UEFI systems on the AMD64 ecosystem and the unique ability to monitor, attack and protect the system throughout operating system startup on bare-metal systems, the authors believe that having the understanding and being able to author this type of hypervisors are valuable for research.
+Given the universality of UEFI systems on the AMD64 ecosystem and the unique ability to monitor, attack and protect the system throughout operating system startup on bare-metal systems, the authors believe that having the understanding and being able to develop this type of hypervisors are valuable for research.
 
 With this goal in mind, the project aims to offer
 - Straightforward and approachable codebase
@@ -43,7 +46,7 @@ Common Requirements:
 
 Requirements for the UEFI driver:
 - UEFI-based system
-- 64bit Windows 10 and Windows 10 IoT Core to boot
+- 64bit Windows 10, IoT Core, or Ubuntu to boot
 
 Requirements for the Windows driver:
 - 64bit Windows 7 and 10
@@ -58,16 +61,17 @@ While this project does not implement any immediately useful features, UEFI-base
 
 * No need of disabling Hyper-V (Virtualization Based Security) to run the custom hypervisor
 * No need of enabling the test-signing mode
-* Zero direct indicator of existence of the hypervisor from Windows perspective
+* Zero direct indicator of existence of the hypervisor from operating system perspective
 * Installing hooks during the early boot phase and letting PatchGuard to protect them
 * Detecting bootkit and early system modification
+* Implementing operating system agnostic solutions
 
 
 Limitations
 ------------
 
 - Nested virtualization is not supported. The CPUID instruction reports that the VMX extension is unsupported.
-- Booting Windows SKUs other than the listed above, as well as Linux are not supported or tested.
+- Booting Windows SKUs other than the listed above is not supported or tested.
 - Sleep and resume are not supported or tested.
 
 
