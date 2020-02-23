@@ -14,10 +14,6 @@
 #include "Platform/EFI/EfiBitmap.h"
 #endif
 
-#if !defined(CHAR_BIT)
-#define CHAR_BIT (8)
-#endif
-
 typedef struct _MEMORY_MANAGER_CONTEXT
 {
     //

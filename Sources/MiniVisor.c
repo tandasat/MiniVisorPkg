@@ -149,19 +149,9 @@ typedef struct _SHARED_PROCESSOR_CONTEXT
     UINT32 NumberOfContexts;
 
     //
-    // The page-aligned, 4KB size region used as a MSR bitmap. The MSR bitmap is
-    // used to indicate which MSR should cause VM-exit on RDMSR and WRMSR. Each
-    // bit in this 4KB region represents ON or OFF of VM-exit, where 0 indicates
-    // not to trigger, and 1 indicates to trigger VM-exit. This hypervisor does
-    // not intend to handle MSR accesses and so, all bits are left as 0. It is
-    // important that this bitmap governs VM-exit behavior only for certain sets
-    // of MSRs. An access to any MSR that is not governed by this bitmap still
-    // causes VM-exit unconditionally. For this reason, this hypervisor still
-    // has RDMSR and WRMSR handling logic.
+    // The MSR bitmap used across all processors.
     //
-    // See: 24.6.9 MSR-Bitmap Address
-    //
-    DECLSPEC_ALIGN(PAGE_SIZE) VOID* MsrBitmap;
+    DECLSPEC_ALIGN(PAGE_SIZE) MSR_BITMAPS MsrBitmaps;
 
     //
     // An array of PER_PROCESSOR_CONTEXTs. Each context is associated with and
@@ -918,7 +908,7 @@ SetupVmcs (
     VmxWrite(VMCS_CTRL_VIRTUAL_PROCESSOR_IDENTIFIER, 1);
 
     /* 64-Bit Control Fields */
-    VmxWrite(VMCS_CTRL_MSR_BITMAP_ADDRESS, GetPhysicalAddress(&VpContexts->MsrBitmap));
+    VmxWrite(VMCS_CTRL_MSR_BITMAP_ADDRESS, GetPhysicalAddress(&VpContexts->MsrBitmaps));
     VmxWrite(VMCS_CTRL_EPT_POINTER, VpContext->EptContext.EptPointer.Flags);
 
     /* 32-Bit Control Fields */
@@ -1165,9 +1155,36 @@ Exit:
 }
 
 /*!
-   @brief Enables hypervisor on the all processors.
+    @brief Initializes the MSR bitmaps.
 
-   @return MV_STATUS_SUCCESS on success; otherwise, an appropriate error code.
+    @details This function clears the bitmaps to avoid VM-exits that do not require
+        manual handling. The MSR that requires manual handling for MiniVisor is
+        IA32_BIOS_SIGN_ID to prevent the guest from attempting update BIOS
+        microcode. See HandleMsrAccess for more details.
+
+   @param[out] Bitmaps - The pointer to the MSR bitmaps to initialize.
+ */
+MV_SECTION_PAGED
+static
+VOID
+InitializeMsrBitmaps (
+    _Out_ MSR_BITMAPS* Bitmaps
+    )
+{
+    static CONST UINT64 biosSignatureByteOffset = (IA32_BIOS_SIGN_ID / CHAR_BIT);
+    static CONST UINT64 biosSignatureBitMask = (1ull << (IA32_BIOS_SIGN_ID % CHAR_BIT));
+
+    PAGED_CODE()
+
+    RtlZeroMemory(Bitmaps, sizeof(*Bitmaps));
+
+    Bitmaps->ReadBitmapLow[biosSignatureByteOffset] |= biosSignatureBitMask;
+}
+
+/*!
+    @brief Enables hypervisor on the all processors.
+
+    @return MV_STATUS_SUCCESS on success; otherwise, an appropriate error code.
  */
 MV_SECTION_PAGED
 static
@@ -1211,6 +1228,7 @@ EnableHypervisorOnAllProcessors (
         goto Exit;
     }
     vpContexts->NumberOfContexts = numberOfProcessors;
+    InitializeMsrBitmaps(&vpContexts->MsrBitmaps);
 
     //
     // Start virtualizing processors one-by-one. This is done by changing

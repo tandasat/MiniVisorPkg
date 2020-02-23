@@ -22,6 +22,10 @@
 #include "ia32-doc/out/ia32.h"
 #pragma warning(pop)
 
+#if !defined(CHAR_BIT)
+#define CHAR_BIT (8)
+#endif
+
 //
 // The entry count within an EPT page table.
 //
@@ -137,3 +141,25 @@ typedef struct _TASK_STATE_SEGMENT_64
 } TASK_STATE_SEGMENT_64;
 C_ASSERT(sizeof(TASK_STATE_SEGMENT_64) == 104);
 #pragma pack(pop)
+
+//
+// The page-aligned, 4KB size region used as a MSR bitmap. The MSR bitmap is
+// used to indicate which MSR should cause VM-exit on RDMSR and WRMSR. Each
+// bit in this 4KB region represents ON or OFF of VM-exit, where 0 indicates
+// not to trigger, and 1 indicates to trigger VM-exit. This hypervisor does
+// not intend to handle MSR accesses and so, all bits are left as 0. It is
+// important that this bitmap governs VM-exit behavior only for certain sets
+// of MSRs. An access to any MSR that is not governed by this bitmap still
+// causes VM-exit unconditionally. For this reason, this hypervisor still
+// has RDMSR and WRMSR handling logic.
+//
+// See: 24.6.9 MSR-Bitmap Address
+//
+typedef struct _MSR_BITMAPS
+{
+    UINT8 ReadBitmapLow[1024];
+    UINT8 ReadBitmapHigh[1024];
+    UINT8 WriteBitmapLow[1024];
+    UINT8 WriteBitmapHigh[1024];
+} MSR_BITMAPS;
+C_ASSERT(sizeof(MSR_BITMAPS) == PAGE_SIZE);

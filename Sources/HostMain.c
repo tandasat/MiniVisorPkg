@@ -47,6 +47,12 @@ typedef struct _INITIAL_HYPERVISOR_STACK
 /*!
     @brief Handles VM-exit due to execution of the RDMSR and WRMSR instruction.
 
+    @details Accessing MSR can results in #GP(0) that would have been handled by
+        the guest. However, in this context, this results in host exception leading
+        to the panic (See HandleHostException). For graceful handling, the handler
+        can check the exception is #GP(0) caused by RDMSR or WRMSR, and if this
+        is the case, inject it to the guest.
+
     @param[in,out] GuestContext - A pointer to the guest context.
 
     @param[in] OperationType - The type of the operation.
@@ -64,18 +70,35 @@ HandleMsrAccess (
     msr = (IA32_MSR_ADDRESS)GuestContext->StackBasedRegisters->Rcx;
     if (OperationType == OperationRead)
     {
-        //
-        // Performs the same read on behalf of the guest.
-        //
-        value = __readmsr(msr);
+        switch (msr)
+        {
+        case IA32_BIOS_SIGN_ID:
+            //
+            // Linux reads this MSR during boot and may attempt to update BIOS
+            // microcode. Returning the greater value than the value the kernel
+            // wishes prevent it from attempt to update microcode. APs will enter
+            // infinite INIT-SIPI loop if this is not done.
+            //
+            // "The VMM may wish to prevent a guest from loading a microcode
+            //  update (...). To prevent microcode update loading, the VMM may
+            //  return a microcode update signature value greater than the value
+            //  of IA32_BIOS_SIGN_ID MSR. A well behaved guest will not attempt
+            //  to load an older microcode update."
+            // See: 32.4.2 Late Load of Microcode Updates
+            //
+            value = MAXUINT64;
+            break;
+
+        default:
+            value = __readmsr(msr);
+            break;
+        }
+
         GuestContext->StackBasedRegisters->Rax = value & MAXUINT32;
         GuestContext->StackBasedRegisters->Rdx = (value >> 32) & MAXUINT32;
     }
     else
     {
-        //
-        // Performs the same write on behalf of the guest.
-        //
         value = (GuestContext->StackBasedRegisters->Rax & MAXUINT32) |
                 ((GuestContext->StackBasedRegisters->Rdx & MAXUINT32) << 32);
         __writemsr(msr, value);
