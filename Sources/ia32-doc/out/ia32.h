@@ -6429,8 +6429,8 @@ typedef union
      * @brief Platform Id <b>(RO)</b>
      *
      * [Bits 52:50] Contains information concerning the intended platform for the processor.
-     * 
-     * 
+     *
+     *
      * 52 | 51 | 50 | _
      * --:|:--:|:---|-----------------
      * 0  | 0  | 0  | Processor Flag 0
@@ -6678,7 +6678,7 @@ typedef struct
  *
  * @remarks 06_01H
  */
-#define IA32_BIOS_UPDATE_SIGNATURE                                   0x0000008B
+#define IA32_BIOS_SIGN_ID                                            0x0000008B
 typedef union
 {
   struct
