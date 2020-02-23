@@ -49,8 +49,8 @@ endm
 ; @brief The default host exception handlers.
 ;
 ; @details This is the function containing actually 256 stub functions generated
-; with the INTERRUPT_HANDLER and INTERRUPT_HANDLER_WITH_CODE macros. Each function
-; works as a hendler of the corresponding interrupt/exception in the host.
+;   with the INTERRUPT_HANDLER and INTERRUPT_HANDLER_WITH_CODE macros. Each function
+;   works as a hendler of the corresponding interrupt/exception in the host.
 ;
 AsmDefaultExceptionHandlers proc
     repeat 8

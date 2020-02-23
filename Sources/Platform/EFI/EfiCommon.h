@@ -75,6 +75,7 @@ void __writedr(unsigned int, unsigned __int64);
 void __writemsr(unsigned long, unsigned __int64);
 void _lgdt(void *);
 void _sgdt(void *);
+void _xsetbv(unsigned int, unsigned __int64);
 
 //
 // MSVC compatibility macro definitions.
