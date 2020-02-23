@@ -215,3 +215,20 @@ CR4
 AdjustGuestCr4 (
     _In_ CR4 Cr4
     );
+
+/*!
+    @brief Find the base address of the image to which the specified address belongs.
+
+    @param[in] GuestContext - The pointer to the guest context.
+
+    @param[in] GuestVirtualAddress - The guest virtual address to find its image
+        base.
+
+    @return The base address of the image to which GuestVirtualAddress belongs, or
+        0 on error.
+ */
+UINT64
+FindImageBase (
+    _In_ GUEST_CONTEXT* GuestContext,
+    _In_ UINT64 GuestVirtualAddress
+    );

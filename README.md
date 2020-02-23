@@ -1,5 +1,5 @@
-What's This
-============
+MiniVisor
+==========
 
 This is a research hypervisor written as a UEFI and Windows driver for the educational purpose for Intel processors.
 
@@ -9,7 +9,11 @@ This MiniVisor, as a UEFI driver, provides the ability to inspect system activit
 Showcase
 ---------
 
-TBD.
+* Loading the hypervisor from the UEFI shell.
+![Readme_Showcase1.jpg](Docs/Resources/Readme_Showcase1.jpg)
+
+* Logging boot activities and interacting with the guest.
+![Readme_Showcase2.jpg](Docs/Resources/Readme_Showcase2.jpg)
 
 
 Motivation
@@ -17,7 +21,7 @@ Motivation
 
 The goal of this project is to share an additional learning resource for writing UEFI hypervisors with the community and researchers.
 
-There are numerous open source hypervisors that can relatively easily study their implementations, but those that support booting operating systems as UEFI drivers are still not many.
+There are numerous open source hypervisors with small and easy-to-study implementations, but those that support booting operating systems as UEFI drivers are still not many.
 
 Given the universality of UEFI systems on the AMD64 ecosystem and the unique ability to monitor, attack and protect the system throughout operating system startup on bare-metal systems, the authors believe that having the understanding and being able to author this type of hypervisors are valuable for research.
 
@@ -45,6 +49,18 @@ Requirements for the Windows driver:
 - 64bit Windows 7 and 10
 
 See [Building and Debugging](Docs/Building_and_Debugging.md) for testing.
+
+
+Advantages and Use Cases
+------------------------
+
+While this project does not implement any immediately useful features, UEFI-based hypervisors have multiple advantages over Windows driver-based ones and can implement unique features.
+
+* No need of disabling Hyper-V (Virtualization Based Security) to run the custom hypervisor
+* No need of enabling the test-signing mode
+* Zero direct indicator of existence of the hypervisor from Windows perspective
+* Installing hooks during the early boot phase and letting PatchGuard to protect them
+* Detecting bootkit and early system modification
 
 
 Limitations

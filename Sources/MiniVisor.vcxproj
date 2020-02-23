@@ -56,9 +56,8 @@
     <IncludePath>$(SolutionDir)Include;$(Edk2Dir)MdePkg\Include;$(Edk2Dir)MdePkg\Include\X64</IncludePath>
     <LibraryPath>$(SolutionDir)Libs</LibraryPath>
     <TargetExt>.efi</TargetExt>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='UEFI'">
     <TargetName>$(ProjectName)Dxe</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -91,6 +90,7 @@
     </PreLinkEvent>
     <PostBuildEvent>
       <Command Condition="'$(Configuration)'=='UEFI'">copy /y $(OutDir)$(TargetName)$(TargetExt) D:\</Command>
+      <Message Condition="'$(Configuration)'=='UEFI'">Copy the build output to the USB drive. Useful for compile and test interation.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

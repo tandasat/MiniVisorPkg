@@ -11,6 +11,7 @@
 #include "Logger.h"
 #include "ExtendedPageTables.h"
 #include "Utils.h"
+#include "MemoryAccess.h"
 
 /*!
     @brief Dumps the segment access rights value.
@@ -412,4 +413,41 @@ AdjustGuestCr4 (
     )
 {
     return AdjustCr4(Cr4);
+}
+
+_Use_decl_annotations_
+UINT64
+FindImageBase (
+    GUEST_CONTEXT* GuestContext,
+    UINT64 GuestVirtualAddress
+    )
+{
+    //
+    // Starting with the 1MB aligned address, and search up IMAGE_DOS_SIGNATURE
+    // every 1MB.
+    //
+    for (UINT64 imageBase = (GuestVirtualAddress & ~(0x10000 - 1));
+         /**/;
+         imageBase -= 0x10000)
+    {
+        BOOLEAN ok;
+        UINT16 contents;
+        MEMORY_ACCESS_ERROR_INFORMATION errorInfo;
+
+        ok = ReadGuestVirtualAddress(GuestContext->Contexts->MemoryAccessContext,
+                                     TRUE,
+                                     imageBase,
+                                     &contents,
+                                     sizeof(contents),
+                                     &errorInfo);
+        if (ok == FALSE)
+        {
+            return 0;
+        }
+
+        if (contents == 0x5A4D)
+        {
+            return imageBase;
+        }
+    }
 }

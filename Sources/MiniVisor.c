@@ -803,6 +803,11 @@ SetupVmcs (
     __sidt(&idtr);
 
     //
+    // Intercept #DB. This is purely for demonstration and can be removed.
+    //
+    exceptionBitmap = (1 << DivideError);
+
+    //
     // VM-entry and -exit controls define how processor should operate on
     // VM-entry and exit. The following configurations are to achieve that:
     //  - Host always runs on the 64bit mode by setting vmExitControls.LoadIa32Efer
@@ -845,7 +850,9 @@ SetupVmcs (
     //   instructions. Those instructions are used in Windows 10. If those are
     //   not set, attempt to execute them causes #UD, which results in a bug
     //   check. VPID is enabled, which could lead to better performance for free
-    //   by not flushing all TLB on every VM-exit. Finally, to enable EPT as well.
+    //   by not flushing all TLB on every VM-exit. Finally, to enable EPT and
+    //   unrestricted guest which are required for the UEFI hypervisor to handle
+    //   the real-mode guest.
     //
     primaryProcBasedControls.Flags = 0;
     primaryProcBasedControls.UseMsrBitmaps = TRUE;
@@ -915,7 +922,6 @@ SetupVmcs (
     VmxWrite(VMCS_CTRL_EPT_POINTER, VpContext->EptContext.EptPointer.Flags);
 
     /* 32-Bit Control Fields */
-    exceptionBitmap = (1 << DivideError);
     VmxWrite(VMCS_CTRL_EXCEPTION_BITMAP, exceptionBitmap);
     VmxWrite(VMCS_CTRL_PIN_BASED_VM_EXECUTION_CONTROLS, pinBasedControls.Flags);
     VmxWrite(VMCS_CTRL_PROCESSOR_BASED_VM_EXECUTION_CONTROLS, primaryProcBasedControls.Flags);

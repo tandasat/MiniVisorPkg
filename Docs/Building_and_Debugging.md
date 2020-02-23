@@ -273,7 +273,7 @@ It is recommended to configure all of them for debugging the UEFI driver.
     ![Building_and_Testing_VMwareWS_FullLogging.png](Resources/Building_and_Testing_VMwareWS_FullLogging.png)
 
     Here is an example output, showing that triple fault occurred.
-    ![Building_and_Testing_VMwareWS_FullLogging_Sample.png](Resources/Building_and_Testing_VMwareWS_FullLogging_Sample.png)
+    ![Building_and_Testing_VMwareWS_FullLogging_Sample.jpg](Resources/Building_and_Testing_VMwareWS_FullLogging_Sample.jpg)
 
 
 UEFI: Viewing Serial Output From the Virtual Machine
@@ -356,7 +356,7 @@ VMware Workstation is the only supported virtualization platform. However, one c
 
     Not usable due to lack of nested virtualization support.
 
-- Boches
+- Bochs
 
     Not usable due to lack of UEFI support.
 

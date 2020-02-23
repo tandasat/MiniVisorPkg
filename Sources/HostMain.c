@@ -331,6 +331,13 @@ HandleCrAccess (
             if (currentCr0.PagingEnable != newCr0.PagingEnable)
             {
                 SwitchGuestPagingMode(newCr0);
+
+                //
+                // For demonstration with VMware. On bare-metal, delay because of
+                // this logging may lead to failure of AP start up.
+                //
+                //LOG_INFO("Processor #%d switching to the long mode",
+                //         GuestContext->Contexts->ProcessorNumber);
             }
             break;
         case VMX_EXIT_QUALIFICATION_REGISTER_CR4:
@@ -452,7 +459,20 @@ HandleExceptionOrNmi (
         ((UINT32)GuestContext->StackBasedRegisters->Rdx == (UINT32)0xffffffff) &&
         ((UINT32)GuestContext->StackBasedRegisters->R8 ==  (UINT32)-1))
     {
-        LOG_DEBUG("KeInitAmd64SpecificState triggered #DE. Ignoring it.");
+        UINT64 ntoskrnlBase;
+
+        //
+        // Just as an example of how to access the guest virtual address, search
+        // the base address of the NT kernel and print it out.
+        //
+        ntoskrnlBase = FindImageBase(GuestContext, GuestContext->VmcsBasedRegisters.Rip);
+        if (ntoskrnlBase != 0)
+        {
+            LOG_INFO("Found ntoskrnl.exe at %016llx", ntoskrnlBase);
+        }
+
+        LOG_INFO("KeInitAmd64SpecificState triggered #DE");
+        LOG_INFO("Skipping main PatchGuard initialization.");
         isKeInitAmd64SpecificStateCalled = TRUE;
         AdvanceGuestInstructionPointer(GuestContext);
         goto Exit;
@@ -479,6 +499,12 @@ HandleInitSignal (
     )
 {
     UNREFERENCED_PARAMETER(GuestContext);
+
+    //
+    // For demonstration with VMware. On bare-metal, delay because of this logging
+    // may lead to failure of AP start up.
+    //
+    //LOG_INFO("Starting up processor #%d", GuestContext->Contexts->ProcessorNumber);
 
     //
     // Simply put the processor into the "wait-for-SIPI" state.
