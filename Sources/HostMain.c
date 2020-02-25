@@ -521,65 +521,20 @@ HandleInitSignal (
     _Inout_ GUEST_CONTEXT* GuestContext
     )
 {
-    UNREFERENCED_PARAMETER(GuestContext);
-
-    //
-    // For demonstration with VMware. On bare-metal, delay because of this logging
-    // may lead to failure of AP start up.
-    //
-    //LOG_INFO("Starting up processor #%d", GuestContext->Contexts->ProcessorNumber);
-
-    //
-    // Simply put the processor into the "wait-for-SIPI" state.
-    //
-    // "All the processors on the system bus (...) execute the multiple processor
-    //  (MP) initialization protocol. ... The application (non-BSP) processors
-    //  (APs) go into a Wait For Startup IPI (SIPI) state while the BSP is executing
-    //  initialization code."
-    //
-    // See: 9.1 INITIALIZATION OVERVIEW
-    //
-    // "Upon receiving an INIT ..., the processor responds by beginning the
-    //  initialization process of the processor core and the local APIC. The state
-    //  of the local APIC following an INIT reset is the same as it is after a
-    //  power-up or hardware reset ... . This state is also referred to at the
-    //  "wait-for-SIPI" state."
-    //
-    // See: 10.4.7.3 Local APIC State After an INIT Reset (“Wait-for-SIPI” State)
-    //
-    VmxWrite(VMCS_GUEST_ACTIVITY_STATE, VmxWaitForSipi);
-}
-
-/*!
-    @brief Handles VM-exit due to the Startup-IPI (SIPI) signal.
-
-    @param[in,out] GuestContext - A pointer to the guest context.
- */
-static
-VOID
-HandleStartupIpi (
-    _Inout_ GUEST_CONTEXT* GuestContext
-    )
-{
     int regs[4];
     CPUID_EAX_01 cpuVersionInfo;
     UINT64 extendedModel;
-    UINT64 vector;
     VMX_SEGMENT_ACCESS_RIGHTS accessRights;
     IA32_VMX_ENTRY_CTLS_REGISTER vmEntryControls;
     CR0 newCr0;
     CR4 newCr4;
 
     //
-    // Intel SDM suggest to issue SIPI twice. This does not appear to be
-    // implemented by many of kernels such as FreeBSD, Linux and Windows, but
-    // ignore it if this occurs, as we already initialized the processor with
-    // the first SIPI.
+    // For demonstration with VMware. On bare-metal, delay because of this logging
+    // may lead to failure of AP start up.
     //
-    if (VmxRead(VMCS_GUEST_ACTIVITY_STATE) == VmxActive)
-    {
-        goto Exit;
-    }
+    //LOG_INFO("Starting up processor #%d", GuestContext->Contexts->ProcessorNumber);
+    UNREFERENCED_PARAMETER(GuestContext);
 
     //
     // Initializes the processor to the state after INIT as described in the
@@ -697,6 +652,40 @@ HandleStartupIpi (
     VmxWrite(VMCS_CTRL_VMENTRY_CONTROLS, vmEntryControls.Flags);
 
     //
+    // "All the processors on the system bus (...) execute the multiple processor
+    //  (MP) initialization protocol. ... The application (non-BSP) processors
+    //  (APs) go into a Wait For Startup IPI (SIPI) state while the BSP is executing
+    //  initialization code."
+    //
+    // See: 9.1 INITIALIZATION OVERVIEW
+    //
+    // "Upon receiving an INIT ..., the processor responds by beginning the
+    //  initialization process of the processor core and the local APIC. The state
+    //  of the local APIC following an INIT reset is the same as it is after a
+    //  power-up or hardware reset ... . This state is also referred to at the
+    //  "wait-for-SIPI" state."
+    //
+    // See: 10.4.7.3 Local APIC State After an INIT Reset (“Wait-for-SIPI” State)
+    //
+    VmxWrite(VMCS_GUEST_ACTIVITY_STATE, VmxWaitForSipi);
+}
+
+/*!
+    @brief Handles VM-exit due to the Startup-IPI (SIPI) signal.
+
+    @param[in,out] GuestContext - A pointer to the guest context.
+ */
+static
+VOID
+HandleStartupIpi (
+    _Inout_ GUEST_CONTEXT* GuestContext
+    )
+{
+    UNREFERENCED_PARAMETER(GuestContext);
+
+    UINT64 vector;
+
+    //
     // Then, emulate effects of SIPI by making further changes.
     //
     // "For a start-up IPI (SIPI), the exit qualification contains the SIPI
@@ -727,12 +716,13 @@ HandleStartupIpi (
     InvalidateVpidDerivedCache((UINT16)VmxRead(VMCS_CTRL_VIRTUAL_PROCESSOR_IDENTIFIER));
 
     //
-    // Done
+    // Done. Note that the 2nd SIPI will be ignored if that occurs after this.
+    //
+    // "If a logical processor is not in the wait-for-SIPI activity state when a
+    //  SIPI arrives, no VM exit occurs and the SIPI is discarded"
+    // See: 25.2 OTHER CAUSES OF VM EXITS
     //
     VmxWrite(VMCS_GUEST_ACTIVITY_STATE, VmxActive);
-
-Exit:
-    return;
 }
 
 /*!
