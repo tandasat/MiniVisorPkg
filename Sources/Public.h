@@ -44,11 +44,11 @@ typedef struct _HYPERVISOR_CONTEXT
     UINT64 Padding2;
 
     //
-    // A pointer to the all-processors context. This value is not used by the
+    // A pointer to the shared processor context. This value is not used by the
     // hypervisor, and the hypervisor doe not know its layout. It is stored here
     // so that it can be returned and freed when hypervisor is being disabled.
     //
-    struct _SHARED_PROCESSOR_CONTEXT* VpContexts;
+    struct _SHARED_PROCESSOR_CONTEXT* SharedProcessorContext;
 
     //
     // A pointer to the EPT context. Needed to handle EPT violation VM-exit.

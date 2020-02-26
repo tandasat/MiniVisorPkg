@@ -384,7 +384,7 @@ IsMiniVisorInstalled (
     @brief Disables hypervisor on the current processor.
 
     @param[in,out] Context - A pointer to the location to receive the address of
-        the all-processors context.
+        the shared processor context.
  */
 static
 _IRQL_requires_max_(PASSIVE_LEVEL)
@@ -394,8 +394,8 @@ DisableHypervisor (
     )
 {
     SHARED_PROCESSOR_CONTEXT* returnedAddress;
-    SHARED_PROCESSOR_CONTEXT** vpContextsAddress;
-    PER_PROCESSOR_CONTEXT* vpContext;
+    SHARED_PROCESSOR_CONTEXT** sharedProcessorContextsAddress;
+    PER_PROCESSOR_CONTEXT* processorContext;
 
     if (IsMiniVisorInstalled() == FALSE)
     {
@@ -404,7 +404,7 @@ DisableHypervisor (
 
     //
     // Issues the hypercall to uninstall the hypervisor. This hypercall returns
-    // the address of the all-processors context on success. If the hypervisor
+    // the address of the shared processor context on success. If the hypervisor
     // is not installed, this (VMCALL instruction) raises #UD.
     //
     returnedAddress = (SHARED_PROCESSOR_CONTEXT*)AsmVmxCall(VmcallUninstall, 0, 0, 0);
@@ -412,23 +412,23 @@ DisableHypervisor (
 
     //
     // Context here is shared across all processors and could already be set the
-    // address of the all-processors context by the other processors. This assert
+    // address of the shared processor context by the other processors. This assert
     // says the address specified by the Context is either not updated yet (== NULL)
     // or updated by the same value as this processor has received (== returnedAddress
-    // == the address of the all-processors context).
+    // == the address of the shared processor context).
     //
-    vpContextsAddress = Context;
-    MV_ASSERT((*vpContextsAddress == NULL) ||
-              (*vpContextsAddress == returnedAddress));
-    *vpContextsAddress = returnedAddress;
+    sharedProcessorContextsAddress = Context;
+    MV_ASSERT((*sharedProcessorContextsAddress == NULL) ||
+              (*sharedProcessorContextsAddress == returnedAddress));
+    *sharedProcessorContextsAddress = returnedAddress;
 
     //
     // Clean up the per-processor stuff, to be precise, EPT setup.
     //
-    vpContext = &(*vpContextsAddress)->Contexts[GetCurrentProcessorNumber()];
-    CleanupExtendedPageTables(&vpContext->EptContext);
-    CleanupMemoryAccess(&vpContext->MemoryAccessContext);
-    CleanupGdt(&vpContext->OriginalGdtr);
+    processorContext = &(*sharedProcessorContextsAddress)->Contexts[GetCurrentProcessorNumber()];
+    CleanupExtendedPageTables(&processorContext->EptContext);
+    CleanupMemoryAccess(&processorContext->MemoryAccessContext);
+    CleanupGdt(&processorContext->OriginalGdtr);
 
 Exit:
     MV_ASSERT(IsMiniVisorInstalled() == FALSE);
@@ -445,15 +445,15 @@ DisableHypervisorOnAllProcessors (
     VOID
     )
 {
-    SHARED_PROCESSOR_CONTEXT* vpContexts;
+    SHARED_PROCESSOR_CONTEXT* sharedProcessorContext;
 
     PAGED_CODE()
 
-    vpContexts = NULL;
-    RunOnAllProcessors(DisableHypervisor, &vpContexts);
-    if (vpContexts != NULL)
+    sharedProcessorContext = NULL;
+    RunOnAllProcessors(DisableHypervisor, &sharedProcessorContext);
+    if (sharedProcessorContext != NULL)
     {
-        MmFreePages(vpContexts);
+        MmFreePages(sharedProcessorContext);
     }
 }
 
@@ -562,9 +562,9 @@ Exit:
         See: 31.5 VMM SETUP & TEAR DOWN
         See: 31.6 PREPARATION AND LAUNCHING A VIRTUAL MACHINE
 
-    @param[in] VpContexts - A pointer to the all-processors context.
+    @param[in] SharedProcessorContext - A pointer to the shared processor context.
 
-    @param[in,out] VpContext - A pointer to the per-processor context for this
+    @param[in,out] ProcessorContext - A pointer to the per-processor context for this
         processor.
 
     @return MV_STATUS_SUCCESS on success, or an appropriate status code on error.
@@ -573,8 +573,8 @@ static
 _Must_inspect_result_
 MV_STATUS
 SetupVmcs (
-    _In_ SHARED_PROCESSOR_CONTEXT* VpContexts,
-    _Inout_ PER_PROCESSOR_CONTEXT* VpContext
+    _In_ SHARED_PROCESSOR_CONTEXT* SharedProcessorContext,
+    _Inout_ PER_PROCESSOR_CONTEXT* ProcessorContext
     )
 {
     //
@@ -627,10 +627,10 @@ SetupVmcs (
     // "TR. The different sub-fields are considered separately:"
     // See: 26.3.1.2 Checks on Guest Segment Registers
     //
-    InitializeGdt(&VpContext->HostGuestTss,
-                  VpContext->HostGuestGdt,
-                  sizeof(VpContext->HostGuestGdt),
-                  &VpContext->OriginalGdtr);
+    InitializeGdt(&ProcessorContext->HostGuestTss,
+                  ProcessorContext->HostGuestGdt,
+                  sizeof(ProcessorContext->HostGuestGdt),
+                  &ProcessorContext->OriginalGdtr);
     MV_ASSERT(AsmReadTr() != 0);
 
     //
@@ -644,7 +644,7 @@ SetupVmcs (
     //  memory."
     // See: 31.5 VMM SETUP & TEAR DOWN
     //
-    MV_ASSERT(PAGE_ALIGN(&VpContext->VmxOnRegion) == &VpContext->VmxOnRegion);
+    MV_ASSERT(PAGE_ALIGN(&ProcessorContext->VmxOnRegion) == &ProcessorContext->VmxOnRegion);
 
     //
     // "Initialize the version identifier in the VMXON region (the first 31 bits)
@@ -653,8 +653,8 @@ SetupVmcs (
     // See: 31.5 VMM SETUP & TEAR DOWN
     //
     vmxBasicMsr.Flags = __readmsr(IA32_VMX_BASIC);
-    VpContext->VmxOnRegion.RevisionId = (UINT32)vmxBasicMsr.VmcsRevisionId;
-    MV_ASSERT(VpContext->VmxOnRegion.MustBeZero == 0);
+    ProcessorContext->VmxOnRegion.RevisionId = (UINT32)vmxBasicMsr.VmcsRevisionId;
+    MV_ASSERT(ProcessorContext->VmxOnRegion.MustBeZero == 0);
 
     //
     // In order to enter the VMX-mode, the bits in CR0 and CR4 have to be
@@ -705,7 +705,7 @@ SetupVmcs (
     //  operand."
     // See: 31.5 VMM SETUP & TEAR DOWN
     //
-    vmxOnPa = GetPhysicalAddress(&VpContext->VmxOnRegion);
+    vmxOnPa = GetPhysicalAddress(&ProcessorContext->VmxOnRegion);
     if (__vmx_on(&vmxOnPa) != VmxResultOk)
     {
         LOG_ERROR("__vmx_on failed");
@@ -735,7 +735,7 @@ SetupVmcs (
     //  capability MSR IA32_VMX_BASIC and aligned to 4-KBytes.
     // See: 31.6 PREPARATION AND LAUNCHING A VIRTUAL MACHINE
     //
-    MV_ASSERT(PAGE_ALIGN(&VpContext->VmcsRegion) == &VpContext->VmcsRegion);
+    MV_ASSERT(PAGE_ALIGN(&ProcessorContext->VmcsRegion) == &ProcessorContext->VmcsRegion);
 
     //
     // "Initialize the version identifier in the VMCS (first 31 bits) with the
@@ -743,8 +743,8 @@ SetupVmcs (
     //  IA32_VMX_BASIC. Clear bit 31 of the first 4 bytes of the VMCS region."
     // See: 31.6 PREPARATION AND LAUNCHING A VIRTUAL MACHINE
     //
-    VpContext->VmcsRegion.RevisionId = (UINT32)vmxBasicMsr.VmcsRevisionId;
-    MV_ASSERT(VpContext->VmcsRegion.ShadowVmcsIndicator == FALSE);
+    ProcessorContext->VmcsRegion.RevisionId = (UINT32)vmxBasicMsr.VmcsRevisionId;
+    MV_ASSERT(ProcessorContext->VmcsRegion.ShadowVmcsIndicator == FALSE);
 
     //
     // "The term "guest-VMCS address" refers to the physical address of the new
@@ -753,7 +753,7 @@ SetupVmcs (
     // "Execute the VMPTRLD instruction by supplying the guest-VMCS address."
     // See: 31.6 PREPARATION AND LAUNCHING A VIRTUAL MACHINE
     //
-    vmcsPa = GetPhysicalAddress(&VpContext->VmcsRegion);
+    vmcsPa = GetPhysicalAddress(&ProcessorContext->VmcsRegion);
     if ((__vmx_vmclear(&vmcsPa) != VmxResultOk) ||
         (__vmx_vmptrld(&vmcsPa) != VmxResultOk))
     {
@@ -772,7 +772,7 @@ SetupVmcs (
     // Initialize EPT specific data structure, which we will referred to as the
     // EPT-context.
     //
-    status = InitializeExtendedPageTables(&VpContext->EptContext);
+    status = InitializeExtendedPageTables(&ProcessorContext->EptContext);
     if (MV_ERROR(status))
     {
         LOG_ERROR("InitializeExtendedPageTables failed : %08x", status);
@@ -783,7 +783,7 @@ SetupVmcs (
     //
     // Take the address of the initial stack pointer for hypervisor.
     //
-    hypervisorStackPointer = (UINT64)&VpContext->HypervisorStack.u.Layout.Context;
+    hypervisorStackPointer = (UINT64)&ProcessorContext->HypervisorStack.u.Layout.Context;
     MV_ASSERT((hypervisorStackPointer % 0x10) == 0);
 
     //
@@ -908,8 +908,8 @@ SetupVmcs (
     VmxWrite(VMCS_CTRL_VIRTUAL_PROCESSOR_IDENTIFIER, 1);
 
     /* 64-Bit Control Fields */
-    VmxWrite(VMCS_CTRL_MSR_BITMAP_ADDRESS, GetPhysicalAddress(&VpContexts->MsrBitmaps));
-    VmxWrite(VMCS_CTRL_EPT_POINTER, VpContext->EptContext.EptPointer.Flags);
+    VmxWrite(VMCS_CTRL_MSR_BITMAP_ADDRESS, GetPhysicalAddress(&SharedProcessorContext->MsrBitmaps));
+    VmxWrite(VMCS_CTRL_EPT_POINTER, ProcessorContext->EptContext.EptPointer.Flags);
 
     /* 32-Bit Control Fields */
     VmxWrite(VMCS_CTRL_EXCEPTION_BITMAP, exceptionBitmap);
@@ -983,8 +983,8 @@ SetupVmcs (
     VmxWrite(VMCS_GUEST_TR_BASE, GetSegmentBase(gdtr.BaseAddress, AsmReadTr()));
     VmxWrite(VMCS_GUEST_GDTR_BASE, gdtr.BaseAddress);
     VmxWrite(VMCS_GUEST_IDTR_BASE, idtr.BaseAddress);
-    VmxWrite(VMCS_GUEST_RSP, VpContext->GuestStackPointer);
-    VmxWrite(VMCS_GUEST_RIP, VpContext->GuestInstructionPointer);
+    VmxWrite(VMCS_GUEST_RSP, ProcessorContext->GuestStackPointer);
+    VmxWrite(VMCS_GUEST_RIP, ProcessorContext->GuestInstructionPointer);
     VmxWrite(VMCS_GUEST_RFLAGS, __readeflags());
     VmxWrite(VMCS_GUEST_SYSENTER_ESP, __readmsr(IA32_SYSENTER_ESP));
     VmxWrite(VMCS_GUEST_SYSENTER_EIP, __readmsr(IA32_SYSENTER_EIP));
@@ -992,11 +992,11 @@ SetupVmcs (
     //
     // Finally, place necessary data for hypervisor into the hypervisor stack.
     //
-    VpContext->HypervisorStack.u.Layout.Context.ProcessorNumber = GetCurrentProcessorNumber();
-    VpContext->HypervisorStack.u.Layout.Context.VpContexts = VpContexts;
-    VpContext->HypervisorStack.u.Layout.Context.EptContext = &VpContext->EptContext;
-    VpContext->HypervisorStack.u.Layout.Context.MemoryAccessContext = &VpContext->MemoryAccessContext;
-    VpContext->HypervisorStack.u.Layout.Context.NestedVmxContext = &VpContext->NestedVmxContext;
+    ProcessorContext->HypervisorStack.u.Layout.Context.ProcessorNumber = GetCurrentProcessorNumber();
+    ProcessorContext->HypervisorStack.u.Layout.Context.SharedProcessorContext = SharedProcessorContext;
+    ProcessorContext->HypervisorStack.u.Layout.Context.EptContext = &ProcessorContext->EptContext;
+    ProcessorContext->HypervisorStack.u.Layout.Context.MemoryAccessContext = &ProcessorContext->MemoryAccessContext;
+    ProcessorContext->HypervisorStack.u.Layout.Context.NestedVmxContext = &ProcessorContext->NestedVmxContext;
     status = MV_STATUS_SUCCESS;
 
 Exit:
@@ -1004,15 +1004,15 @@ Exit:
     {
         if (eptInitialized != FALSE)
         {
-            CleanupExtendedPageTables(&VpContext->EptContext);
+            CleanupExtendedPageTables(&ProcessorContext->EptContext);
         }
         if (vmxOn != FALSE)
         {
             __vmx_off();
         }
-        if (VpContext->OriginalGdtr.BaseAddress != 0)
+        if (ProcessorContext->OriginalGdtr.BaseAddress != 0)
         {
-            CleanupGdt(&VpContext->OriginalGdtr);
+            CleanupGdt(&ProcessorContext->OriginalGdtr);
         }
     }
     return status;
@@ -1021,7 +1021,7 @@ Exit:
 /*!
     @brief Enables hypervisor on the current processor.
 
-    @param[in,out] Context - A pointer to the all-processors context.
+    @param[in,out] Context - A pointer to the shared processor context.
  */
 static
 _IRQL_requires_max_(PASSIVE_LEVEL)
@@ -1031,28 +1031,28 @@ EnableHypervisor (
     )
 {
     UINT32 processorNumber;
-    SHARED_PROCESSOR_CONTEXT* vpContexts;
-    PER_PROCESSOR_CONTEXT* vpContext;
+    SHARED_PROCESSOR_CONTEXT* sharedProcessorContext;
+    PER_PROCESSOR_CONTEXT* processorContext;
     UINT64 guestRsp;
     UINT64 guestRip;
     BOOLEAN maCtxInitialized;
 
     maCtxInitialized = FALSE;
 
-    vpContexts = Context;
+    sharedProcessorContext = Context;
     processorNumber = GetCurrentProcessorNumber();
-    MV_ASSERT(processorNumber < vpContexts->NumberOfContexts);
-    vpContext = &vpContexts->Contexts[processorNumber];
+    MV_ASSERT(processorNumber < sharedProcessorContext->NumberOfContexts);
+    processorContext = &sharedProcessorContext->Contexts[processorNumber];
 
     //
     // Initialize the context of API to access guest virtual address from the
     // host.
     //
-    vpContext->Status = InitializeMemoryAccess(&vpContext->MemoryAccessContext,
+    processorContext->Status = InitializeMemoryAccess(&processorContext->MemoryAccessContext,
                                                GetHostCr3());
-    if (MV_ERROR(vpContext->Status))
+    if (MV_ERROR(processorContext->Status))
     {
-        LOG_ERROR("InitializeMemoryAccess failed : %08x", vpContext->Status);
+        LOG_ERROR("InitializeMemoryAccess failed : %08x", processorContext->Status);
         goto Exit;
     }
     maCtxInitialized = TRUE;
@@ -1085,12 +1085,12 @@ EnableHypervisor (
         VMX_RESULT result;
         VMX_ERROR_NUMBER vmxErrorStatus;
 
-        vpContext->GuestStackPointer = guestRsp;
-        vpContext->GuestInstructionPointer = guestRip;
-        vpContext->Status = SetupVmcs(vpContexts, vpContext);
-        if (MV_ERROR(vpContext->Status))
+        processorContext->GuestStackPointer = guestRsp;
+        processorContext->GuestInstructionPointer = guestRip;
+        processorContext->Status = SetupVmcs(sharedProcessorContext, processorContext);
+        if (MV_ERROR(processorContext->Status))
         {
-            LOG_ERROR("SetupVmcs failed : %08x", vpContext->Status);
+            LOG_ERROR("SetupVmcs failed : %08x", processorContext->Status);
             goto Exit;
         }
 
@@ -1140,17 +1140,17 @@ EnableHypervisor (
         vmxErrorStatus = (result == VmxResultErrorWithStatus) ?
             (VMX_ERROR_NUMBER)VmxRead(VMCS_VM_INSTRUCTION_ERROR) : 0;
         LOG_ERROR("__vmx_vmlaunch failed : %u", vmxErrorStatus);
-        vpContext->Status = MV_STATUS_HV_OPERATION_FAILED;
-        CleanupExtendedPageTables(&vpContext->EptContext);
+        processorContext->Status = MV_STATUS_HV_OPERATION_FAILED;
+        CleanupExtendedPageTables(&processorContext->EptContext);
         __vmx_off();
-        CleanupGdt(&vpContext->OriginalGdtr);
+        CleanupGdt(&processorContext->OriginalGdtr);
         goto Exit;
     }
 
 Exit:
-    if (MV_ERROR(vpContext->Status) && (maCtxInitialized != FALSE))
+    if (MV_ERROR(processorContext->Status) && (maCtxInitialized != FALSE))
     {
-        CleanupMemoryAccess(&vpContext->MemoryAccessContext);
+        CleanupMemoryAccess(&processorContext->MemoryAccessContext);
     }
 }
 
@@ -1198,7 +1198,7 @@ EnableHypervisorOnAllProcessors (
     MV_STATUS status;
     UINT32 numberOfProcessors;
     UINT32 allocationSize;
-    SHARED_PROCESSOR_CONTEXT* vpContexts;
+    SHARED_PROCESSOR_CONTEXT* sharedProcessorContext;
     BOOLEAN virtualized;
 
     PAGED_CODE()
@@ -1206,7 +1206,7 @@ EnableHypervisorOnAllProcessors (
     virtualized = FALSE;
 
     //
-    // Compute the size of all-processors contexts. The all-processors contexts
+    // Compute the size of shared processor contexts. The shared processor contexts
     // contain VT-x related data shared across all processors and as well as
     // a per-processor context for each processor. The per-processor context
     // contains VT-x related data that are specific to the processor.
@@ -1221,14 +1221,14 @@ EnableHypervisorOnAllProcessors (
     //
     // Allocate the context.
     //
-    vpContexts = MmAllocatePages((UINT8)BYTES_TO_PAGES(allocationSize));
-    if (vpContexts == NULL)
+    sharedProcessorContext = MmAllocatePages((UINT8)BYTES_TO_PAGES(allocationSize));
+    if (sharedProcessorContext == NULL)
     {
         status = MV_STATUS_INSUFFICIENT_RESOURCES;
         goto Exit;
     }
-    vpContexts->NumberOfContexts = numberOfProcessors;
-    InitializeMsrBitmaps(&vpContexts->MsrBitmaps);
+    sharedProcessorContext->NumberOfContexts = numberOfProcessors;
+    InitializeMsrBitmaps(&sharedProcessorContext->MsrBitmaps);
 
     //
     // Start virtualizing processors one-by-one. This is done by changing
@@ -1238,24 +1238,24 @@ EnableHypervisorOnAllProcessors (
     // DPC or IPI instead, so that this operation is parallelized and eliminates
     // any chance of race.
     //
-    RunOnAllProcessors(EnableHypervisor, vpContexts);
+    RunOnAllProcessors(EnableHypervisor, sharedProcessorContext);
 
     //
     // Assume success first, then inspect the results from each processor and
     // update status as necessary.
     //
     status = MV_STATUS_SUCCESS;
-    for (UINT32 i = 0; i < vpContexts->NumberOfContexts; ++i)
+    for (UINT32 i = 0; i < sharedProcessorContext->NumberOfContexts; ++i)
     {
-        if (MV_ERROR(vpContexts->Contexts[i].Status))
+        if (MV_ERROR(sharedProcessorContext->Contexts[i].Status))
         {
             //
             // At least one processor failed to enable hypervisor.
             //
             LOG_ERROR("EnableHypervisor on processor %lu failed : %08x",
                       i,
-                      vpContexts->Contexts[i].Status);
-            status = vpContexts->Contexts[i].Status;
+                      sharedProcessorContext->Contexts[i].Status);
+            status = sharedProcessorContext->Contexts[i].Status;
         }
         else
         {
@@ -1276,15 +1276,15 @@ Exit:
             //
             // Disable hypervisor if one or more processors enabled but also the
             // other processor(s) failed. This takes care of freeing the
-            // all-processors contexts.
+            // shared processor contexts.
             //
             DisableHypervisorOnAllProcessors();
         }
         else
         {
-            if (vpContexts != NULL)
+            if (sharedProcessorContext != NULL)
             {
-                MmFreePages(vpContexts);
+                MmFreePages(sharedProcessorContext);
             }
         }
     }

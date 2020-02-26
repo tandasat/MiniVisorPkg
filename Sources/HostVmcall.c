@@ -59,7 +59,7 @@ HandleVmcallUninstall (
 
     //
     // Save some values needed for clean up in the volatile registers.
-    // RAX = The address of the all-processors context. This is used as a
+    // RAX = The address of the shared processor context. This is used as a
     //       return value of the AsmVmxCall function.
     // RCX = The address to continue execution after the execution of the VMXOFF
     //       instruction. This value is needed because we have to manually
@@ -73,7 +73,7 @@ HandleVmcallUninstall (
     //       "RFLAGS is cleared, except bit 1, which is always set."
     //       See: 27.5.3 Loading Host RIP, RSP, and RFLAGS
     //
-    GuestContext->StackBasedRegisters->Rax = (UINT64)GuestContext->Contexts->VpContexts;
+    GuestContext->StackBasedRegisters->Rax = (UINT64)GuestContext->Contexts->SharedProcessorContext;
     GuestContext->StackBasedRegisters->Rcx = GuestContext->VmcsBasedRegisters.Rip +
         VmxRead(VMCS_VMEXIT_INSTRUCTION_LENGTH);
     GuestContext->StackBasedRegisters->Rdx = GuestContext->VmcsBasedRegisters.Rsp;

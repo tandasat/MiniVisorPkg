@@ -147,7 +147,7 @@ ExitVm:
         ;
         ; Termination of the VM is requested. Executes VMXOFF and end
         ; virtualization. At this point, some registers have specific values:
-        ;   RAX = VpContexts
+        ;   RAX = Shared processor context
         ;   RCX = Guest RIP for the next instruction
         ;   RDX = Guest RSP
         ;   R8  = Guest RFLAGS
