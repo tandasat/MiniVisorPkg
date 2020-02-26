@@ -3,15 +3,13 @@ Building and Debugging
 
 This document provides step-by-step instructions to build and debug MiniVisor for both UEFI and Windows driver configurations.
 
-
 Common Build Prerequisites
 ---------------------------
 
 To build MiniVisor, the followings are required.
-- [Visual Studio Community 2019](https://www.visualstudio.com/downloads/)
-- [Windows Software Development Kit (SDK) for Windows 10 ](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) 10.0.18362 or later
-- [Windows Driver Kit (WDK) for Windows 10](https://developer.microsoft.com/en-us/windows/hardware/windows-driver-kit) 10.0.18362 or later
-
+* [Visual Studio Community 2019](https://www.visualstudio.com/downloads/)
+* [Windows Software Development Kit (SDK) for Windows 10](https://developer.microsoft.*om/en-us/windows/downloads/windows-10-sdk) 10.0.18362 or later
+* [Windows Driver Kit (WDK) for Windows 10](https://developer.microsoft.com/en-us/windows/hardware/windows-driver-kit) 10.0.18362 or later
 
 Terms
 ------
@@ -19,7 +17,6 @@ Terms
 In this document, the "host" system refers to the system that builds MiniVisor and runs debugger. It may also run the target system as a virtual machine.
 
 The "target" system refers to the system that loads MiniVisor". This can be a separate bare-metal machine or a virtual machine running inside the host system.
-
 
 UEFI: Building the Driver
 --------------------------
@@ -89,16 +86,15 @@ The below instructions are all to be done on the host system.
     (You should see multiple entries under C:\edk2\Build\)
     ```
 
-
 UEFI: Preparing the Target System
 ----------------------------------
 
 The target system must be a UEFI-based x64 system without Secure Boot and be able to boot one of the supported operating systems.
 
 In the case of virtual machines, only VMware Workstation is supported. For the other possible configurations, see the below sections. With VMware Workstation, make sure that
-- `Virtualize Intel VT-x/EPT or AMD-V/RVI` is checked,
-- in the `Advanced` section, `UEFI` is selected, and
-- `Enable secure boot` is unchecked.
+* `Virtualize Intel VT-x/EPT or AMD-V/RVI` is checked,
+* in the `Advanced` section, `UEFI` is selected, and
+* `Enable secure boot` is unchecked.
 
 ![Building_and_Testing_VMwareWS_VTx.png](Resources/Building_and_Testing_VMwareWS_VTx.png)
 
@@ -106,7 +102,6 @@ In the case of virtual machines, only VMware Workstation is supported. For the o
 
 In the case of bare-metal, some UEFI-based systems enable the "legacy BIOS" mode to boot the operating system. This mode is essentially equivalent to using old fashioned BIOS and not supported by this project. Changing the mode is possible in the UEFI settings but will render the existing operating system unbootable. Here is the example with Dell UEFI settings configured to boot the system with the UEFI mode.
 ![Building_and_Testing_BootMode.jpg](Resources/Building_and_Testing_BootMode.jpg)
-
 
 UEFI: Loading the Driver
 -------------------------
@@ -155,7 +150,7 @@ In this instruction, we will boot the target system into the UEFI shell, load Mi
 5. Select the filesystem
 
     1. Run `map` command to list the available filesystems. Identify one that has `USB` in the path. We assume that is `fs1:` in this instruction.
-        - If not found, USB might not be recognized. Make sure it is accessible from the target system and run `map -r` to refresh the list.
+        * If not found, USB might not be recognized. Make sure it is accessible from the target system and run `map -r` to refresh the list.
     2. Run `fs1:` to move to the filesystem.
     3. Run `ls` command and make sure `MiniVisorDxe.efi` exists.
 
@@ -177,7 +172,6 @@ In this instruction, we will boot the target system into the UEFI shell, load Mi
 
 Unloading the driver after operating system boot is unsupported.
 
-
 UEFI: Building the Project on Visual Studio
 --------------------------------------------
 
@@ -188,7 +182,6 @@ __Once the project is built with EDK2__, you may build it on Visual Studio with 
 3. Run `Build Solution`
 
 Visual Studio will produce output as `C:\edk2\MiniVisorPkg\Builds\x64\UEFI\MiniVisorDxe.efi`. This binary is always compiled for debugging without optimization.
-
 
 UEFI: Build Customization
 --------------------------
@@ -209,7 +202,6 @@ UEFI: Build Customization
 
     For more details of logging with serial output, see the below section.
 
-
 UEFI & Windows: Testing Existence of MiniVisor
 -----------------------------------------------
 
@@ -217,8 +209,8 @@ One can verify that MiniVisor has virtualized all processors by executing the ac
 
 This program can be compiled into both for Windows and Linux.
 
-- For Windows, open `MiniVisorPkg\Tests\CheckHvVendor\CheckHvVendor.sln` with Visual Studio and compile it with `x64` + `Release` configuration.
-- For Linux, compile `MiniVisorPkg\Tests\CheckHvVendor\CheckHvVendor\CheckHvVendor.cpp` with `g++`.
+* For Windows, open `MiniVisorPkg\Tests\CheckHvVendor\CheckHvVendor.sln` with Visual Studio and compile it with `x64` + `Release` configuration.
+* For Linux, compile `MiniVisorPkg\Tests\CheckHvVendor\CheckHvVendor\CheckHvVendor.cpp` with `g++`.
 
 Once compiled, deploy the executable onto the target system and run from the terminal. The output should contain `MiniVisor` if MiniVisor is successfully installed.
 
@@ -233,7 +225,6 @@ Result: MiniVisor
 Executing CPUID(0x40000000) on CPU 3
 Result: MiniVisor
 ```
-
 
 UEFI: Configuring VMware Virtual Machine for Debugging
 -------------------------------------------------------
@@ -275,7 +266,6 @@ It is recommended to configure all of them for debugging the UEFI driver.
     Here is an example output, showing that triple fault occurred.
     ![Building_and_Testing_VMwareWS_FullLogging_Sample.jpg](Resources/Building_and_Testing_VMwareWS_FullLogging_Sample.jpg)
 
-
 UEFI: Viewing Serial Output From the Virtual Machine
 -----------------------------------------------------
 
@@ -300,7 +290,6 @@ To do so,
 This also displays unhandled exception information that occurred during UEFI boot-time if possible. This is extremely useful since a debugger (mentioned below) is unable to catch and diagnose them.
 ![Building_and_Testing_PuTTY_Exception_with_VMware.png](Resources/Building_and_Testing_PuTTY_Exception_with_VMware.png)
 
-
 UEFI: Debugging the Driver with a Debugger
 -------------------------------------------
 
@@ -324,42 +313,39 @@ Debugging the UEFI driver is not easy due to the fact that source-level debuggin
 
     See "Debugging a standalone module loaded in a UEFI shell" section of the accompanying manual if interested.
 
-
-
 UEFI: Testing with Other Virtualization Platform
 -------------------------------------------------
 
 VMware Workstation is the only supported virtualization platform. However, one can choose to try on the other system with some limitations. This section describes limitations on the other vitalization platforms for the purpose of developing and testing a UEFI driver hypervisor.
 
-- KVM + QEMU on Linux
+* KVM + QEMU on Linux
 
     This is the most viable alternative, and even in some cases more useful than VMware Workstation.
 
     Pros:
-    - No software cost.
-    - Possible to inspect the system even on an unhandled exception. This is not possible with VMware Workstation as it terminates immediately.
-    - Functional with a single processor configuration.
+    * No software cost.
+    * Possible to inspect the system even on an unhandled exception. This is not possible with VMware Workstation as it terminates immediately.
+    * Functional with a single processor configuration.
 
     Cons:
-    - Unable to test multi-processor configurations. Boot hangs once VMXON is executed on an application processor.
-    - A Linux host is required.
+    * Unable to test multi-processor configurations. Boot hangs once VMXON is executed on an application processor.
+    * A Linux host is required.
 
-- Hyper-V
+* Hyper-V
 
     Hardly usable due to lack of multi-processor protocol support and underneath Hyper-V forwarding VM-exit despite those are not enabled.
 
-- VirtualBox
+* VirtualBox
 
     Not usable due to lack of nested EPT support and buggy nesting implementation.
 
-- QEMU on Windows
+* QEMU on Windows
 
     Not usable due to lack of nested virtualization support.
 
-- Bochs
+* Bochs
 
     Not usable due to lack of UEFI support.
-
 
 UEFI: Testing with Single-board Computers
 ------------------------------------------
@@ -368,12 +354,10 @@ Testing against physical devices is MUST. While testing on VMware can uncover ma
 
 The authors recommend purchasing an AMD64 single-board computer with a serial port and test against it. One of such devices is [MinnowBoard Turbot](https://store.netgate.com/Turbot4.aspx). We do not go into details of how to set it up for debugging as it is device-specific.
 
-
 UEFI: Testing with Regular Devices
 -----------------------------------
 
 Testing against regular laptops and desktops is another way to find bugs. This does not require purchasing and configuring a single board computer, but diagnosing issues tends to be significantly harder due to not being able to use serial logging.
-
 
 UEFI: Debugging Tricks
 -----------------------
@@ -382,15 +366,13 @@ UEFI: Debugging Tricks
 2. If you use IDA Pro for debugging, run `Builds\Platform\EFI\locate_image_base.py` and follow the instructions displayed after attaching to the target.
 3. Start with a single processor. With a bare-metal, where its processor count cannot be reduced, just skip entering the non-root mode on application processors.
 
-
 Windows: Building the Driver
 -----------------------------
 
-Building the Windows driver can be fully done on Visual Studio with the following stesp:
+Building the Windows driver can be fully done on Visual Studio with the following steps:
 1. Open `MiniVisorPkg\Builds\MiniVisor.sln` with Visual Studio.
 2. Select `Debug` or `Release` build configuration.
 3. Run `Build Solution`.
-
 
 Windows: Preparing the Target System
 -------------------------------------
@@ -412,7 +394,6 @@ Finally, run the following command to create the service to load the driver on t
 > sc.exe create MiniVisor type= kernel binPath= C:\Users\user\Desktop\MiniVisor.sys
 ```
 
-
 Windows: Loading the Driver
 ----------------------------
 
@@ -425,7 +406,6 @@ Similarly, the below command will unload the driver.
 ```
 > sc.exe stop MiniVisor
 ```
-
 
 Windows: Debugging the Driver with a Debugger
 ----------------------------------------------
