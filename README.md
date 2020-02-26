@@ -1,6 +1,8 @@
 MiniVisor
 ==========
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5781c969419c47059f1aba259443fe79)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tandasat/MiniVisorPkg&amp;utm_campaign=Badge_Grade)
+
 This is a research hypervisor written as a UEFI and Windows driver for the educational purpose for Intel processors.
 
 This MiniVisor, as a UEFI driver, provides the ability to inspect system activities even before the operating system boots, while as a Windows driver, allows developers to debug it with familiar tools like WinDbg.
@@ -28,15 +30,6 @@ There are numerous open source hypervisors with small and easy-to-study implemen
 
 Given the universality of UEFI systems on the AMD64 ecosystem and the unique ability to monitor, attack and protect the system throughout operating system startup on bare-metal systems, the authors believe that having the understanding and being able to develop this type of hypervisors are valuable for research.
 
-With this goal in mind, the project aims to offer
-- Straightforward and approachable codebase
-    - over highly-abstracted but intricate structures
-- Rich comments aimed for new learners
-    - over just-enough for those who already know how hypervisor works
-- Minimal functionality to highlight core concepts to study
-    - over extensibility and direct usefulness
-- Extensive documentation on development environment setup
-
 
 System Requirements
 --------------------
@@ -55,7 +48,7 @@ See [Building and Debugging](Docs/Building_and_Debugging.md) for testing.
 
 
 Advantages and Use Cases
-------------------------
+-------------------------
 
 While this project does not implement any immediately useful features, UEFI-based hypervisors have multiple advantages over Windows driver-based ones and can implement unique features.
 
@@ -65,14 +58,6 @@ While this project does not implement any immediately useful features, UEFI-base
 * Installing hooks during the early boot phase and letting PatchGuard to protect them
 * Detecting bootkit and early system modification
 * Implementing operating system agnostic solutions
-
-
-Limitations
-------------
-
-- Nested virtualization is not supported. The CPUID instruction reports that the VMX extension is unsupported.
-- Booting Windows SKUs other than the listed above is not supported or tested.
-- Sleep and resume are not supported or tested.
 
 
 Acknowledgments
