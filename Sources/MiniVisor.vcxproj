@@ -79,7 +79,7 @@
       <SubSystem>EFI Runtime</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>BaseDebugLibSerialPort.lib;BaseDebugPrintErrorLevelLib.lib;BaseIoLibIntrinsicSev.lib;BaseLib.lib;BaseMemoryLibOptDxe.lib;BasePrintLib.lib;BaseSynchronizationLib.lib;BaseTimerLibNullTemplate.lib;DxePcdLib.lib;UefiBootServicesTableLib.lib;UefiDevicePathLibDevicePathProtocol.lib;UefiDriverEntryPoint.lib;UefiLib.lib;UefiMemoryAllocationLib.lib;UefiRuntimeServicesTableLib.lib;MiniVisorDxe.lib;PcAtSerialPortLib.lib</AdditionalDependencies>
+      <AdditionalDependencies>BaseDebugPrintErrorLevelLib.lib;BaseLib.lib;BaseMemoryLibOptDxe.lib;BasePrintLib.lib;BaseSynchronizationLib.lib;BaseTimerLibNullTemplate.lib;DxePcdLib.lib;UefiBootServicesTableLib.lib;UefiDebugLibConOut.lib;UefiDevicePathLibDevicePathProtocol.lib;UefiDriverEntryPoint.lib;UefiLib.lib;UefiMemoryAllocationLib.lib;UefiRuntimeServicesTableLib.lib;MiniVisorDxe.lib</AdditionalDependencies>
       <EntryPointSymbol>_ModuleEntryPoint</EntryPointSymbol>
       <EnableUAC>false</EnableUAC>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -90,7 +90,7 @@
     </PreLinkEvent>
     <PostBuildEvent>
       <Command Condition="'$(Configuration)'=='UEFI'">copy /y $(OutDir)$(TargetName)$(TargetExt) D:\</Command>
-      <Message Condition="'$(Configuration)'=='UEFI'">Copy the build output to the USB drive. Useful for compile and test interation.</Message>
+      <Message Condition="'$(Configuration)'=='UEFI'">Coping the build output to the USB drive. This is useful for compile and test interation.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
