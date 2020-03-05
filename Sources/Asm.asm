@@ -181,17 +181,12 @@ VmxError:
         ; to do here is probably to call a C-function that does diagnostics
         ; like dumping VMCS.
         ;
+        pushf
         PUSHAQ
-        sub     rsp, 68h
-        movaps  xmmword ptr [rsp +  0h], xmm0
-        movaps  xmmword ptr [rsp + 10h], xmm1
-        movaps  xmmword ptr [rsp + 20h], xmm2
-        movaps  xmmword ptr [rsp + 30h], xmm3
-        movaps  xmmword ptr [rsp + 40h], xmm4
-        movaps  xmmword ptr [rsp + 50h], xmm5
         mov     rcx, rsp
         sub     rsp, 20h
         call    HandleVmExitFailure
+        jmp     $
 AsmHypervisorEntryPoint endp
 
 ;

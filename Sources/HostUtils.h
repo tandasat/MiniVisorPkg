@@ -122,8 +122,8 @@ VmxWrite (
 
     @param[in] Field - A VMCS field to read a value from.
 
-    @return A value read from the VMCS. MAXUINT64 is returned when a non-existent
-        VMCS field is requested for read.
+    @return A value read from the VMCS. 0 is returned when a non-existent VMCS
+        field is requested for read.
  */
 UINT64
 VmxRead (

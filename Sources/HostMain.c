@@ -849,7 +849,7 @@ HandleVmExit (
             DumpGuestState();
             DumpHostState();
             DumpControl();
-            LOG_DEBUG("VM-exit reason (Full) = %x", vmExitReason.Flags);
+            LOG_DEBUG("VM-exit reason (Full) = %08x", vmExitReason.Flags);
             MV_PANIC();
     }
 
@@ -894,7 +894,7 @@ typedef struct _EXCEPTION_STACK
     UINT64 ErrorCode;
     UINT64 Rip;
     UINT64 Cs;
-    UINT64 Rflags;
+    RFLAGS Rflags;
 } EXCEPTION_STACK;
 
 /*!
@@ -917,15 +917,37 @@ HandleHostException (
     DumpHostState();
     DumpControl();
     LOG_ERROR("Exception or interrupt 0x%llx(0x%llx)", Stack->InterruptNumber, Stack->ErrorCode);
-    LOG_ERROR("RIP  - %016llx, CS  - %016llx, RFLAGS - %016llx", Stack->Rip, Stack->Cs, Stack->Rflags);
+    LOG_ERROR("RIP  - %016llx, CS  - %016llx, RFLAGS - %016llx", Stack->Rip, Stack->Cs, Stack->Rflags.Flags);
     LOG_ERROR("RAX  - %016llx, RCX - %016llx, RDX - %016llx", Stack->Rax, Stack->Rcx, Stack->Rdx);
     LOG_ERROR("RBX  - %016llx, RSP - %016llx, RBP - %016llx", Stack->Rbx, 0ull, Stack->Rbp);
     LOG_ERROR("RSI  - %016llx, RDI - %016llx", Stack->Rsi, Stack->Rdi);
     LOG_ERROR("R8   - %016llx, R9  - %016llx, R10 - %016llx", Stack->R8, Stack->R9, Stack->R10);
     LOG_ERROR("R11  - %016llx, R12 - %016llx, R13 - %016llx", Stack->R11, Stack->R12, Stack->R13);
     LOG_ERROR("R14  - %016llx, R15 - %016llx", Stack->R14, Stack->R15);
+    LOG_ERROR("CR2  - %016llx", __readcr2());
     MV_PANIC();
 }
+
+typedef struct _VMENTRY_FAILURE_STACK
+{
+    UINT64 R15;
+    UINT64 R14;
+    UINT64 R13;
+    UINT64 R12;
+    UINT64 R11;
+    UINT64 R10;
+    UINT64 R9;
+    UINT64 R8;
+    UINT64 Rdi;
+    UINT64 Rsi;
+    UINT64 Rbp;
+    UINT64 Rbx;
+    UINT64 Rdx;
+    UINT64 Rcx;
+    UINT64 Rax;
+    RFLAGS Rflags;
+} VMENTRY_FAILURE_STACK;
+
 
 /*!
     @brief Handles error occurred on attempt to exit to the guest.
@@ -935,20 +957,27 @@ HandleHostException (
  */
 VOID
 HandleVmExitFailure (
-    _In_ CONST INITIAL_HYPERVISOR_STACK* Stack
+    _In_ CONST VMENTRY_FAILURE_STACK* Stack
     )
 {
     VMX_ERROR_NUMBER vmxErrorNumber;
     VMX_VMEXIT_REASON vmExitReason;
 
-    UNREFERENCED_PARAMETER(Stack);
-
-    vmxErrorNumber = (VMX_ERROR_NUMBER)VmxRead(VMCS_VM_INSTRUCTION_ERROR);
     vmExitReason.Flags = (UINT32)VmxRead(VMCS_EXIT_REASON);
+    if (Stack->Rflags.ZeroFlag != FALSE)
+    {
+        vmxErrorNumber = (VMX_ERROR_NUMBER)VmxRead(VMCS_VM_INSTRUCTION_ERROR);
+    }
+    else
+    {
+        vmxErrorNumber = 0;
+    }
 
     DumpGuestState();
     DumpHostState();
     DumpControl();
-    LOG_ERROR("VM-exit reason (full) = %x, Error = %ul", vmExitReason.Flags, vmxErrorNumber);
+    LOG_ERROR("VM-exit reason (full) = %08x, Error = %u",
+              vmExitReason.Flags,
+              vmxErrorNumber);
     MV_PANIC();
 }

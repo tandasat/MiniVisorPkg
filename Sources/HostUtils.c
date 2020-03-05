@@ -27,17 +27,17 @@ DumpAccessRights (
     VMX_SEGMENT_ACCESS_RIGHTS rights;
 
     rights.Flags = (UINT32)AccessRights;
-    LOG_ERROR(" - Type      = %ul", rights.Type);
-    LOG_ERROR(" - S         = %ul", rights.DescriptorType);
-    LOG_ERROR(" - DPL       = %ul", rights.DescriptorPrivilegeLevel);
-    LOG_ERROR(" - P         = %ul", rights.Present);
-    LOG_ERROR(" - Reserved1 = %ul", rights.Reserved1);
-    LOG_ERROR(" - Available = %ul", rights.AvailableBit);
-    LOG_ERROR(" - L         = %ul", rights.LongMode);
-    LOG_ERROR(" - D/B       = %ul", rights.DefaultBig);
-    LOG_ERROR(" - G         = %ul", rights.Granularity);
-    LOG_ERROR(" - Unusable  = %ul", rights.Unusable);
-    LOG_ERROR(" - Reserved2 = %ul", rights.Reserved2);
+    LOG_ERROR(" - Type      = %u", rights.Type);
+    LOG_ERROR(" - S         = %u", rights.DescriptorType);
+    LOG_ERROR(" - DPL       = %u", rights.DescriptorPrivilegeLevel);
+    LOG_ERROR(" - P         = %u", rights.Present);
+    LOG_ERROR(" - Reserved1 = %u", rights.Reserved1);
+    LOG_ERROR(" - Available = %u", rights.AvailableBit);
+    LOG_ERROR(" - L         = %u", rights.LongMode);
+    LOG_ERROR(" - D/B       = %u", rights.DefaultBig);
+    LOG_ERROR(" - G         = %u", rights.Granularity);
+    LOG_ERROR(" - Unusable  = %u", rights.Unusable);
+    LOG_ERROR(" - Reserved2 = %u", rights.Reserved2);
 }
 
 VOID
@@ -287,7 +287,7 @@ VmxRead (
         {
             MV_PANIC();
         }
-        fieldValue = MAXUINT64;
+        fieldValue = 0;
     }
     return fieldValue;
 }
