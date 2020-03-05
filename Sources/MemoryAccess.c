@@ -11,6 +11,7 @@
 #include "HostUtils.h"
 #include "Platform.h"
 #include "MemoryManager.h"
+#include "Logger.h"
 
 /*!
     @brief Split a 2MB EPT PDE to 512 EPT PTEs.

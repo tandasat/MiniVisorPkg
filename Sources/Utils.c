@@ -10,6 +10,7 @@
  */
 #include "Utils.h"
 #include "Asm.h"
+#include "Logger.h"
 
 _Use_decl_annotations_
 UINT64

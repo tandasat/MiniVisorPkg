@@ -34,6 +34,7 @@
 #include "EfiAsm.h"
 #include "EfiPlatform.h"
 #include "../../Utils.h"
+#include "EfiLogger.h"
 
 //
 // The format of the IDT.

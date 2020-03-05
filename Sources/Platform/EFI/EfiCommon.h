@@ -26,12 +26,31 @@
 #define MV_DEBUG_BREAK()
 #define MV_SECTION_INIT
 #define MV_SECTION_PAGED
-#define MV_ASSERT(x)        ASSERT(x)
+
+/*!
+    @brief Custom ASSERT.
+
+    @details This is a workaround of that the EFI standard ASSERT can cause page
+        fault (null pointer access) when it fires in the host code. The author
+        has not been able to find out the root cause and a fix.
+ */
 #if !defined(MDEPKG_NDEBUG)
-#define MV_VERIFY(x)        ASSERT(x)
+#define MV_ASSERT(x) \
+    if (!(x)) \
+    { \
+        LOG_ERROR("ASSERT %a(%d): %a", __FILE__, __LINE__, #x); \
+        MV_PANIC(); \
+    } (VOID*)NULL
+#else
+#define MV_ASSERT(x)
+#endif
+
+#if !defined(MDEPKG_NDEBUG)
+#define MV_VERIFY(x)        MV_ASSERT(x)
 #else
 #define MV_VERIFY(x)        (x)
 #endif
+
 #define MV_MAX(x, y)        MAX((x), (y))
 #define MV_MIN(x, y)        MIN((x), (y))
 
