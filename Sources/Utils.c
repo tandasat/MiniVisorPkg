@@ -1,8 +1,7 @@
 /*!
     @file Utils.c
 
-    @brief Utility functions that could be used by both on root and non-root
-        operations.
+    @brief Utility functions that could be used by both the host and non-host.
 
     @author Satoshi Tanda
 
@@ -75,10 +74,10 @@ Exit:
 /*!
     @brief Returns the segment descriptor corresponds to the SegmentSelector.
 
-    @param[in] DescriptorTableBase - An address of the base of the descriptor
+    @param[in] DescriptorTableBase - The address of the base of the descriptor
         table.
 
-    @param[in] SegmentSelector - A segment selector value.
+    @param[in] SegmentSelector - The segment selector value.
 
     @return The segment descriptor corresponds to the SegmentSelector.
  */

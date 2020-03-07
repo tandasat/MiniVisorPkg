@@ -107,9 +107,9 @@ DumpControl (
 /*!
     @brief Writes the value to the VMCS.
 
-    @param[in] Field - A VMCS field to write the value to.
+    @param[in] Field - The VMCS field to write the value to.
 
-    @param[in] FieldValue - A value to write.
+    @param[in] FieldValue - The value to write.
  */
 VOID
 VmxWrite (
@@ -120,7 +120,7 @@ VmxWrite (
 /*!
     @brief Read a value from the VMCS.
 
-    @param[in] Field - A VMCS field to read a value from.
+    @param[in] Field - The VMCS field to read a value from.
 
     @return A value read from the VMCS. 0 is returned when a non-existent VMCS
         field is requested for read.
@@ -134,7 +134,7 @@ VmxRead (
     @brief Advances the guest's RIP to the address of the next instruction. This
         implies that the hypervisor completed emulation of the instruction.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 VOID
 AdvanceGuestInstructionPointer (
@@ -150,7 +150,6 @@ AdvanceGuestInstructionPointer (
 _Must_inspect_result_
 BOOLEAN
 IsGuestInKernelMode (
-    VOID
     );
 
 /*!
@@ -160,16 +159,16 @@ IsGuestInKernelMode (
         corresponding exception handler before executing the instruction pointed
         by Rip.
 
-    @param[in] InterruptionType - A type of interrupt to inject.
+    @param[in] InterruptionType - The type of interrupt to inject.
 
-    @param[in] Vector - A vector number of interrupt to inject.
+    @param[in] Vector - The vector number of interrupt to inject.
 
     @param[in] DeliverErrorCode - TRUE when the interrupt should have an error
         code. Whether the interrupt should have an error code is defined by the
         Intel SDM. See comments in the EXCEPTION_VECTOR definitions for a quick
         reference.
 
-    @param[in] ErrorCode - An error code. Not used when DeliverErrorCode is FALSE.
+    @param[in] ErrorCode - The error code. Not used when DeliverErrorCode is FALSE.
  */
 VOID
 InjectInterruption (
@@ -217,7 +216,7 @@ AdjustGuestCr4 (
     );
 
 /*!
-    @brief Find the base address of the image to which the specified address belongs.
+    @brief Finds the base address of the image to which the specified address belongs.
 
     @param[in] GuestContext - The pointer to the guest context.
 

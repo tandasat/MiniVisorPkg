@@ -1,3 +1,9 @@
+#!/usr/bin/python
+#
+# Locates the image base from the current RIP value. This can be manually invoked
+# from the IDA Pro during the GDB remote debug session to load symbols (a PDB file).
+#
+# Author: Satoshi Tanda
 current_page_base = idaapi.get_reg_val('rip') & (~0xfff)
 offset = 0
 while idc.read_dbg_word(current_page_base - offset) != 0x5a4d:

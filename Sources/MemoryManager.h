@@ -3,6 +3,10 @@
 
     @brief Functions for memory management.
 
+    @details All API in this file are prefixed with Mm because naive names
+        conflict with platform API, for example, AllocatePages and FreePages in
+        EDK2.
+
     @author Satoshi Tanda
 
     @copyright Copyright (c) 2020 - , Satoshi Tanda. All rights reserved.

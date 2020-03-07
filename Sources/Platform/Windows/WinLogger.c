@@ -457,7 +457,7 @@ LogFlushThread (
     LOGGER_CONTEXT* logger;
     LARGE_INTEGER interval;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     logger = (LOGGER_CONTEXT*)StartContext;
     interval.QuadPart = -(10000ll * logger->FlushIntervalInMs);
@@ -562,13 +562,6 @@ CleanupPairedLogBuffer (
     ExFreePoolWithTag(PairedLogBuffer->InactiveLogBuffer->LogEntries, LOGGER_POOL_TAG);
 }
 
-/*!
-    @brief Initializes the global logger.
-
-    @param[in] Configuration - The configuration for initialization.
-
-    @return STATUS_SUCCESS on success; otherwise, an appropriate error code.
- */
 LOGGER_INIT
 _Use_decl_annotations_
 NTSTATUS
@@ -581,7 +574,7 @@ InitializeLogger (
     HANDLE fileHandle;
     HANDLE threadHandle;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     MV_ASSERT(g_Logger == NULL);
 
@@ -615,7 +608,7 @@ InitializeLogger (
                                    &filePath,
                                    OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE,
                                    NULL,
-                                   NULL)
+                                   NULL);
         status = ZwCreateFile(&fileHandle,
                               FILE_APPEND_DATA | SYNCHRONIZE,
                               &objectAttributes,
@@ -709,7 +702,6 @@ InitializeLogger (
     //
     g_Logger = logger;
 
-
 Exit:
     if (NT_ERROR(status))
     {
@@ -729,9 +721,6 @@ Exit:
     return status;
 }
 
-/*!
-    @brief Clean up the logger.
- */
 LOGGER_PAGED
 _Use_decl_annotations_
 VOID
@@ -742,7 +731,7 @@ CleanupLogger (
     LOGGER_CONTEXT* logger;
     SIZE_T maxOverflowedLogSize;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     MV_ASSERT(g_Logger != NULL);
 

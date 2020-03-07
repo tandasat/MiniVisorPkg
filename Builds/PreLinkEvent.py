@@ -1,3 +1,10 @@
+#!/usr/bin/python
+#
+# Copies the lib files created by the EDK2's build command to a single specified
+# locations, so that Visual Studio can easily find and link them. Invoked as
+# part of Pre-Link Event of the MiniVisor project.
+#
+# Author: Satoshi Tanda
 import os
 import sys
 import shutil

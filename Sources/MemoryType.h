@@ -9,7 +9,6 @@
  */
 #pragma once
 #include "Common.h"
-#include "Ia32.h"
 
 /*!
     @brief Initializes the MTRR context.
@@ -21,12 +20,12 @@ InitializeMemoryTypeMapping (
 /*!
     @brief Returns a memory type for the given physical address range.
 
-    @param[in] PhysicalAddress - A physical address to retrieve its memory type.
+    @param[in] PhysicalAddress - The physical address to retrieve its memory type.
 
     @param[in] RangeSize - The size of the range to check.
 
     @return The memory type for the given physical address. If the range contains
-        more than one memory type, return MEMORY_TYPE_INVALID.
+        more than one memory type, MEMORY_TYPE_INVALID.
  */
 IA32_MEMORY_TYPE
 GetMemoryTypeForRange (

@@ -15,7 +15,6 @@
  */
 VOID
 AsmDefaultExceptionHandlers (
-    VOID
     );
 
 /*!
@@ -23,5 +22,4 @@ AsmDefaultExceptionHandlers (
  */
 VOID
 AsmNmiExceptionHandler (
-    VOID
     );

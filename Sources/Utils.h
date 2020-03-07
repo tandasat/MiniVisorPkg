@@ -1,8 +1,7 @@
 /*!
     @file Utils.h
 
-    @brief Utility functions that could be used by both on root and non-root
-        operations.
+    @brief Utility functions that could be used by both the host and non-host.
 
     @author Satoshi Tanda
 
@@ -36,7 +35,7 @@ ComputeAddressFromIndexes (
     @brief Returns the access right of the segment specified by the SegmentSelector
         for VMX.
 
-    @param[in] SegmentSelector - A segment selector value.
+    @param[in] SegmentSelector - The segment selector value.
 
     @return The access right of the segment for VMX.
  */
@@ -48,7 +47,7 @@ GetSegmentAccessRight (
 /*!
     @brief Returns the base address of the segment specified by SegmentSelector.
 
-    @param[in] DescriptorTableBase - An address of the base of the descriptor
+    @param[in] DescriptorTableBase - The address of the base of the descriptor
         table.
 
     @param[in] SegmentSelector - The segment selector which points to the

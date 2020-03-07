@@ -1,7 +1,7 @@
 /*!
     @file Public.h
 
-    @brief Interfaces to communicate with our hypervisor.
+    @brief Interfaces to communicate with the hypervisor.
 
     @author Satoshi Tanda
 

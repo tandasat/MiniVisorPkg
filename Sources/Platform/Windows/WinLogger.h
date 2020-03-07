@@ -69,6 +69,13 @@ typedef struct _LOGGER_CONFIGURATION
     PCWSTR FilePath;
 } LOGGER_CONFIGURATION;
 
+/*!
+    @brief Initializes the global logger.
+
+    @param[in] Configuration - The configuration for initialization.
+
+    @return STATUS_SUCCESS on success; otherwise, an appropriate error code.
+ */
 _IRQL_requires_max_(PASSIVE_LEVEL)
 _Must_inspect_result_
 NTSTATUS
@@ -76,6 +83,9 @@ InitializeLogger (
     _In_ CONST LOGGER_CONFIGURATION* Configuration
     );
 
+/*!
+    @brief Clean up the logger.
+ */
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID
 CleanupLogger (

@@ -8,9 +8,9 @@
         reused once they are set, even after they are "cleared".
 
         For complete implementation, one can copy ReactOS's implementation if
-        licensing the project under GPL is acceptable. hvpp by wbenny has its own
-        implementation of bitmap but is actually influenced by ReactOS
-        implementation and such should be treated as GPL.
+        licensing the project under GPL is acceptable. hvpp by Petr Beneš has its
+        own implementation of bitmap but is actually influenced by ReactOS
+        implementation, and such, should be treated as GPL.
 
     @author Satoshi Tanda
 

@@ -37,11 +37,11 @@ typedef struct _EPT_ENTRIES
 C_ASSERT(sizeof(EPT_ENTRIES) == sizeof(VOID*) * 4);
 
 /*!
-    @brief Cleans up all EPT entries and the table recursively.
+    @brief Cleans up all EPT entries and the tables recursively.
 
-    @param[in,out] EptTable - A pointer to the EPT table to clean up.
+    @param[in,out] EptTable - The pointer to the EPT table to clean up.
 
-    @param[in] PageMapLevel - A level of the table.
+    @param[in] PageMapLevel - The level of the table.
  */
 static
 VOID

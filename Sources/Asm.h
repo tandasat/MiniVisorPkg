@@ -10,28 +10,27 @@
 #pragma once
 #include "Common.h"
 
-#if defined(NTDDI_VERSION)
+#if defined(MV_PLATFORM_WINDOWS)
 #include "Platform/Windows/WinAsm.h"
 #else
 #include "Platform/EFI/EfiAsm.h"
 #endif
 
 /*!
-    @brief An entry point for the hypervisor.
+    @brief The entry point for the hypervisor.
 
-    @details See x64.asm.
+    @details See Asm.asm.
  */
 VOID
 AsmHypervisorEntryPoint (
-    VOID
     );
 
 /*!
-    @brief Invalidate translations derived from EPT.
+    @brief Invalidates translations derived from EPT.
 
-    @param[in] InvEptType - A type of invalidation.
+    @param[in] InvEptType - The type of invalidation.
 
-    @param[in] InvEptDescriptor - A description of translations to invalidate.
+    @param[in] InvEptDescriptor - The description of translations to invalidate.
 
     @return An appropriate VMX_RESULT value.
  */
@@ -42,11 +41,11 @@ AsmInvept (
     );
 
 /*!
-    @brief Invalidate translations based on VPID.
+    @brief Invalidates translations based on VPID.
 
-    @param[in] InvVpidType - A type of invalidation.
+    @param[in] InvVpidType - The type of invalidation.
 
-    @param[in] InvVpidDescriptor - A description of translations to invalidate.
+    @param[in] InvVpidDescriptor - The description of translations to invalidate.
 
     @return An appropriate VMX_RESULT value.
  */
@@ -55,7 +54,6 @@ AsmInvvpid (
     _In_ INVVPID_TYPE InvVpidType,
     _In_ CONST INVVPID_DESCRIPTOR* InvVpidDescriptor
     );
-
 
 /*!
     @brief Reads the access rights byte of the segment.
@@ -93,13 +91,12 @@ AsmVmxCall (
     );
 
 /*!
-    @brief Returns the address of the return address from this function.
+    @brief Returns the return address from this function.
 
-    @return The address of the return address from this function.
+    @return The return address from this function.
  */
 UINT64
 AsmGetCurrentInstructionPointer (
-    VOID
     );
 
 /*!
@@ -109,5 +106,4 @@ AsmGetCurrentInstructionPointer (
  */
 UINT64
 AsmGetCurrentStackPointer (
-    VOID
     );

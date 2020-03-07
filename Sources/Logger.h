@@ -19,7 +19,7 @@
 // difference of the formatting functions. Use them like the standard's PRIx macro
 // family.
 //
-#if defined(NTDDI_VERSION)
+#if defined(MV_PLATFORM_WINDOWS)
 #define LOG_PRIANSI     "s"
 #define LOG_PRIUNICODE  "S"
 #else

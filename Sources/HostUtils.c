@@ -308,7 +308,6 @@ AdvanceGuestInstructionPointer (
 _Use_decl_annotations_
 BOOLEAN
 IsGuestInKernelMode (
-    VOID
     )
 {
     VMX_SEGMENT_ACCESS_RIGHTS accessRight;

@@ -36,7 +36,7 @@ HandleVmcallUninstall (
     // from the guest state fields of the VMCS. However, it is not the case when
     // the VMRESUME is not called, like here. In such a case those values must
     // be restored with normal value manually, or PatchGuard will report
-    // integrity violation.
+    // integrity violation on Windows.
     //
     // "The GDTR and IDTR limits are each set to FFFFH."
     // See: 27.5.2 Loading Host Segment and Descriptor-Table Registers

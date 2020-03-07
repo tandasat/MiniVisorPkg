@@ -9,10 +9,17 @@
  */
 #pragma once
 #if defined(NTDDI_VERSION)
+#define MV_PLATFORM_WINDOWS
+#else
+#define MV_PLATFORM_EFI
+#endif
+
+#if defined(MV_PLATFORM_WINDOWS)
 #include "Platform/Windows/WinCommon.h"
 #else
 #include "Platform/EFI/EfiCommon.h"
 #endif
+
 #include "Ia32.h"
 
 //

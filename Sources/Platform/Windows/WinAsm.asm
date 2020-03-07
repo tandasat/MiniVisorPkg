@@ -10,7 +10,7 @@
 .code
 
 ;
-;   @brief Read the value from LDTR.
+;   @brief Reads the value of LDTR.
 ;
 ;   @return The value of LDTR.
 ;
@@ -20,7 +20,7 @@ AsmReadLdtr proc
 AsmReadLdtr endp
 
 ;
-;   @brief Read the value from TR.
+;   @brief Reads the value of TR.
 ;
 ;   @return The value of TR.
 ;
@@ -30,7 +30,7 @@ AsmReadTr proc
 AsmReadTr endp
 
 ;
-;   @brief Read the value from ES.
+;   @brief Reads the value of ES.
 ;
 ;   @return The value of ES.
 ;
@@ -40,7 +40,7 @@ AsmReadEs proc
 AsmReadEs endp
 
 ;
-;   @brief Read the value from CS.
+;   @brief Reads the value of CS.
 ;
 ;   @return The value of CS.
 ;
@@ -50,7 +50,7 @@ AsmReadCs proc
 AsmReadCs endp
 
 ;
-;   @brief Read the value from SS.
+;   @brief Reads the value of SS.
 ;
 ;   @return The value of SS.
 ;
@@ -60,7 +60,7 @@ AsmReadSs proc
 AsmReadSs endp
 
 ;
-;   @brief Read the value from DS.
+;   @brief Reads the value of DS.
 ;
 ;   @return The value of DS.
 ;
@@ -70,7 +70,7 @@ AsmReadDs proc
 AsmReadDs endp
 
 ;
-;   @brief Read the value from FS.
+;   @brief Reads the value of FS.
 ;
 ;   @return The value of FS.
 ;
@@ -80,7 +80,7 @@ AsmReadFs proc
 AsmReadFs endp
 
 ;
-;   @brief Read the value from GS.
+;   @brief Reads the value of GS.
 ;
 ;   @return The value of GS.
 ;
@@ -90,7 +90,7 @@ AsmReadGs proc
 AsmReadGs endp
 
 ;
-;   @brief Write the value to TR.
+;   @brief Writes the value to TR.
 ;
 ;   @param[in] RCX - The new TR value to write.
 ;

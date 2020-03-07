@@ -97,7 +97,7 @@ ConvertNtToMvStatus (
 
     @param[in] DriverObject - The driver's driver object.
 
-    @param[in] RegistryPath - A path to the driver's registry key.
+    @param[in] RegistryPath - The path to the driver's registry key.
 
     @return STATUS_SUCCESS on success; otherwise, an appropriate error code.
  */
@@ -148,7 +148,7 @@ DriverUnload (
 {
     UNREFERENCED_PARAMETER(DriverObject);
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     //
     // Start cross-platform clean up.
@@ -165,7 +165,7 @@ InitializePlatform (
     NTSTATUS status;
     LOGGER_CONFIGURATION loggerConfig;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     //
     // Initialize in-house logger. Enable all flags.
@@ -192,7 +192,7 @@ VOID
 CleanupPlatform (
     )
 {
-    PAGED_CODE()
+    PAGED_CODE();
 
     CleanupLogger();
 }
@@ -206,7 +206,7 @@ Sleep (
 {
     LARGE_INTEGER interval;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     interval.QuadPart = -(LONGLONG)(10000 * Milliseconds);
     (VOID)KeDelayExecutionThread(KernelMode, FALSE, &interval);
@@ -296,7 +296,7 @@ ReserveVirtualAddress (
     UINT64 PageCount
     )
 {
-    PAGED_CODE()
+    PAGED_CODE();
 
     return MmAllocateMappingAddress(PageCount * PAGE_SIZE, MV_POOL_TAG);
 }
@@ -309,7 +309,7 @@ FreeReservedVirtualAddress (
     UINT64 PageCount
     )
 {
-    PAGED_CODE()
+    PAGED_CODE();
 
     UNREFERENCED_PARAMETER(PageCount);
 
@@ -326,7 +326,7 @@ RunOnAllProcessors (
 {
     UINT32 numberOfProcessors;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     numberOfProcessors = KeQueryActiveProcessorCountEx(ALL_PROCESSOR_GROUPS);
     for (UINT32 index = 0; index < numberOfProcessors; ++index)

@@ -164,10 +164,10 @@ typedef struct _SHARED_PROCESSOR_CONTEXT
     @brief Returns the VM control value that is adjusted in consideration with
         the VMX capability MSR.
 
-    @param[in] VmxCapabilityMsr - A VMX capability MSR to consult to adjust the
+    @param[in] VmxCapabilityMsr - The VMX capability MSR to consult to adjust the
         RequestedValue,
 
-    @param[in] RequestedValue - A VM control value that needs adjustment.
+    @param[in] RequestedValue - The VM control value that needs adjustment.
 
     @return The adjusted control value.
  */
@@ -220,7 +220,7 @@ AdjustControlValue (
     @brief Adjusts a pin-based control value in consideration with the VMX
         capability MSR.
 
-    @param[in,out] PinBasedControls - A pointer to the pin-based control value
+    @param[in,out] PinBasedControls - The pointer to the pin-based control value
         to adjust.
  */
 static
@@ -233,9 +233,9 @@ AdjustPinBasedControls (
     IA32_VMX_BASIC_REGISTER vmxBasicMsr;
 
     //
-    // This determine the right VMX capability MSR based on the value of
+    // This determines the right VMX capability MSR based on the value of
     // IA32_VMX_BASIC. With the right VMX capability MSR, the
-    // AdjustControlValue function implements the logic described under
+    // AdjustControlValue function implements the logic described as below.
     // "It is necessary for software to consult only one of the capability MSRs
     //  to determine the allowed settings of the pin based VM-execution controls:"
     // See: A.3.1 Pin-Based VM-Execution Controls
@@ -252,7 +252,7 @@ AdjustPinBasedControls (
     @brief Adjusts a processor-based control value in consideration with the VMX
         capability MSR.
 
-    @param[in,out] PrimaryProcBasedControls - A pointer to the processor-based
+    @param[in,out] PrimaryProcBasedControls - The pointer to the processor-based
         control value to adjust.
  */
 static
@@ -280,7 +280,7 @@ AdjustProcessorBasedControls (
     @brief Adjusts a VM-exit control value in consideration with the VMX
         capability MSR.
 
-    @param[in,out] VmExitControls - A pointer to the VM-exit control value to
+    @param[in,out] VmExitControls - The pointer to the VM-exit control value to
         adjust.
  */
 static
@@ -307,7 +307,7 @@ AdjustVmExitControls (
     @brief Adjusts a VM-entry control value in consideration with the VMX
         capability MSR.
 
-    @param[in,out] VmEntryControls - A pointer to the VM-entry control value to
+    @param[in,out] VmEntryControls - The pointer to the VM-entry control value to
         adjust.
  */
 static
@@ -334,7 +334,7 @@ AdjustVmEntryControls (
     @brief Adjusts a secondary processor-based control value in consideration
         with the VMX capability MSR.
 
-    @param[in,out] SecondaryProcBasedControls - A pointer to the secondary
+    @param[in,out] SecondaryProcBasedControls - The pointer to the secondary
         processor-based control value to adjust.
  */
 static
@@ -361,7 +361,6 @@ static
 _Must_inspect_result_
 BOOLEAN
 IsMiniVisorInstalled (
-    VOID
     )
 {
     int registers[4];   // EAX, EBX, ECX, and EDX
@@ -381,11 +380,12 @@ IsMiniVisorInstalled (
 }
 
 /*!
-    @brief Disables hypervisor on the current processor.
+    @brief Disables the hypervisor on the current processor.
 
-    @param[in,out] Context - A pointer to the location to receive the address of
+    @param[in,out] Context - The pointer to the location to receive the address of
         the shared processor context.
  */
+MV_SECTION_PAGED
 static
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID
@@ -397,6 +397,8 @@ DisableHypervisor (
     SHARED_PROCESSOR_CONTEXT** sharedProcessorContextsAddress;
     PER_PROCESSOR_CONTEXT* processorContext;
 
+    PAGED_CODE();
+
     if (IsMiniVisorInstalled() == FALSE)
     {
         goto Exit;
@@ -404,8 +406,7 @@ DisableHypervisor (
 
     //
     // Issues the hypercall to uninstall the hypervisor. This hypercall returns
-    // the address of the shared processor context on success. If the hypervisor
-    // is not installed, this (VMCALL instruction) raises #UD.
+    // the address of the shared processor context on success.
     //
     returnedAddress = (SHARED_PROCESSOR_CONTEXT*)AsmVmxCall(VmcallUninstall, 0, 0, 0);
     MV_ASSERT(returnedAddress != NULL);
@@ -423,7 +424,7 @@ DisableHypervisor (
     *sharedProcessorContextsAddress = returnedAddress;
 
     //
-    // Clean up the per-processor stuff, to be precise, EPT setup.
+    // Clean up the per-processor data structures.
     //
     processorContext = &(*sharedProcessorContextsAddress)->Contexts[GetCurrentProcessorNumber()];
     CleanupExtendedPageTables(&processorContext->EptContext);
@@ -435,19 +436,18 @@ Exit:
 }
 
 /*!
-    @brief Enables hypervisor on the all processors.
+    @brief Disables the hypervisor on the all processors.
  */
 MV_SECTION_PAGED
 static
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID
 DisableHypervisorOnAllProcessors (
-    VOID
     )
 {
     SHARED_PROCESSOR_CONTEXT* sharedProcessorContext;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     sharedProcessorContext = NULL;
     RunOnAllProcessors(DisableHypervisor, &sharedProcessorContext);
@@ -467,7 +467,6 @@ static
 _Must_inspect_result_
 BOOLEAN
 IsVmxAvailable (
-    VOID
     )
 {
     BOOLEAN vmxAvailable;
@@ -494,7 +493,7 @@ IsVmxAvailable (
     //
     // Check the processor support the write-back type for VMCS. We do not
     // support the processor that does not support the write-back type for
-    // simplicity. It is not practically an issue since
+    // simplicity. It is practically not an issue since
     // "As of this writing, all processors that support VMX operation indicate
     //  the write-back type."
     //
@@ -529,19 +528,17 @@ IsVmxAvailable (
     }
 
     //
-    // Check the followings to confirm availability of EPT related capabilities:
-    // - page walk length is 4 steps
-    // - extended page tables can be laid out in write-back memory
-    // - INVEPT instruction for global context is supported
-    // - INVVPID instruction for global context is supported
+    // Check the followings to confirm availability of EPT related capabilities.
     //
     eptVpidCapabilityMsr.Flags = __readmsr(IA32_VMX_EPT_VPID_CAP);
     if ((eptVpidCapabilityMsr.PageWalkLength4 == FALSE) ||
         (eptVpidCapabilityMsr.MemoryTypeWriteBack == FALSE) ||
         (eptVpidCapabilityMsr.Pde2MbPages == FALSE) ||
         (eptVpidCapabilityMsr.Invept == FALSE) ||
+        (eptVpidCapabilityMsr.InveptSingleContext == FALSE) ||
         (eptVpidCapabilityMsr.InveptAllContexts == FALSE) ||
         (eptVpidCapabilityMsr.Invvpid == FALSE) ||
+        (eptVpidCapabilityMsr.InvvpidSingleContext == FALSE) ||
         (eptVpidCapabilityMsr.InvvpidAllContexts == FALSE))
     {
         LOG_ERROR("EPT is not supported.");
@@ -562,10 +559,10 @@ Exit:
         See: 31.5 VMM SETUP & TEAR DOWN
         See: 31.6 PREPARATION AND LAUNCHING A VIRTUAL MACHINE
 
-    @param[in] SharedProcessorContext - A pointer to the shared processor context.
+    @param[in] SharedProcessorContext - The pointer to the shared processor context.
 
-    @param[in,out] ProcessorContext - A pointer to the per-processor context for this
-        processor.
+    @param[in,out] ProcessorContext - The pointer to the per-processor context
+        for this processor.
 
     @return MV_STATUS_SUCCESS on success, or an appropriate status code on error.
  */
@@ -618,7 +615,7 @@ SetupVmcs (
 
     //
     // VMX requires TR to be configured properly (ie, non zero). This requirement
-    // is not already satisfied in case of EFI environment. Set it up by updating
+    // is not satisfied yet in case of EFI environment. Set it up by updating
     // GDT as necessary.
     //
     // "The selector fields for CS and TR cannot be 0000H."
@@ -769,8 +766,7 @@ SetupVmcs (
     //
 
     //
-    // Initialize EPT specific data structure, which we will referred to as the
-    // EPT-context.
+    // Initialize EPT specific data structures.
     //
     status = InitializeExtendedPageTables(&ProcessorContext->EptContext);
     if (MV_ERROR(status))
@@ -829,20 +825,20 @@ SetupVmcs (
     // instructions.
     //
     // - MSR bitmaps are used; this is not to cause VM-exit as much as possible.
-    //   We are setting the MSR bitmaps that are all cleared below (see code
-    //   around the "64-Bit Control Fields" comment). This prevents VM-exits from
-    //   occurring when 0x0 - 0x1fff and 0xc0000000 - 0xc0001fff are accessed.
-    //   Note that VM-exit still occurs if outside the range is accessed, and it
-    //   is not possible to prevent this.
+    //   We are setting the MSR bitmaps that are mostly cleared below (see
+    //   InitializeMsrBitmaps). This prevents VM-exits from occurring when
+    //   0x0 - 0x1fff and 0xc0000000 - 0xc0001fff are accessed. VM-exit still
+    //   occurs if outside the range is accessed, and it is not possible to
+    //   prevent this.
     //
     // - The secondary processor-based controls are used; this is to let the
     //   guest (Windows) executes RDTSCP, INVPCID and the XSAVE/XRSTORS family
     //   instructions. Those instructions are used in Windows 10. If those are
     //   not set, attempt to execute them causes #UD, which results in a bug
     //   check. VPID is enabled, which could lead to better performance for free
-    //   by not flushing all TLB on every VM-exit. Finally, to enable EPT and
-    //   unrestricted guest which are required for the UEFI hypervisor to handle
-    //   the real-mode guest.
+    //   by not flushing all TLB on every VM-exit and VM-entry. Finally, enabling
+    //   EPT and unrestricted guest which are required for the UEFI hypervisor to
+    //   handle the real-mode guest.
     //
     primaryProcBasedControls.Flags = 0;
     primaryProcBasedControls.UseMsrBitmaps = TRUE;
@@ -870,13 +866,20 @@ SetupVmcs (
     //  RPL (bits 1:0) and the TI flag (bit 2) must be 0"
     // See: 26.2.3 Checks on Host Segment and Descriptor-Table Registers
     //
-    VmxWrite(VMCS_HOST_ES_SELECTOR, AsmReadEs() & ~hostSegmentSelectorMask);
-    VmxWrite(VMCS_HOST_CS_SELECTOR, AsmReadCs() & ~hostSegmentSelectorMask);
-    VmxWrite(VMCS_HOST_SS_SELECTOR, AsmReadSs() & ~hostSegmentSelectorMask);
-    VmxWrite(VMCS_HOST_DS_SELECTOR, AsmReadDs() & ~hostSegmentSelectorMask);
-    VmxWrite(VMCS_HOST_FS_SELECTOR, AsmReadFs() & ~hostSegmentSelectorMask);
-    VmxWrite(VMCS_HOST_GS_SELECTOR, AsmReadGs() & ~hostSegmentSelectorMask);
-    VmxWrite(VMCS_HOST_TR_SELECTOR, AsmReadTr() & ~hostSegmentSelectorMask);
+    MV_ASSERT(FlagOn(AsmReadEs(), hostSegmentSelectorMask) == FALSE);
+    MV_ASSERT(FlagOn(AsmReadCs(), hostSegmentSelectorMask) == FALSE);
+    MV_ASSERT(FlagOn(AsmReadSs(), hostSegmentSelectorMask) == FALSE);
+    MV_ASSERT(FlagOn(AsmReadDs(), hostSegmentSelectorMask) == FALSE);
+    MV_ASSERT(FlagOn(AsmReadFs(), hostSegmentSelectorMask) == FALSE);
+    MV_ASSERT(FlagOn(AsmReadGs(), hostSegmentSelectorMask) == FALSE);
+    MV_ASSERT(FlagOn(AsmReadTr(), hostSegmentSelectorMask) == FALSE);
+    VmxWrite(VMCS_HOST_ES_SELECTOR, AsmReadEs());
+    VmxWrite(VMCS_HOST_CS_SELECTOR, AsmReadCs());
+    VmxWrite(VMCS_HOST_SS_SELECTOR, AsmReadSs());
+    VmxWrite(VMCS_HOST_DS_SELECTOR, AsmReadDs());
+    VmxWrite(VMCS_HOST_FS_SELECTOR, AsmReadFs());
+    VmxWrite(VMCS_HOST_GS_SELECTOR, AsmReadGs());
+    VmxWrite(VMCS_HOST_TR_SELECTOR, AsmReadTr());
 
     /* 64-Bit Host-State Fields */
     VmxWrite(VMCS_HOST_EFER, __readmsr(IA32_EFER));
@@ -1021,8 +1024,9 @@ Exit:
 /*!
     @brief Enables hypervisor on the current processor.
 
-    @param[in,out] Context - A pointer to the shared processor context.
+    @param[in,out] Context - The pointer to the shared processor context.
  */
+MV_SECTION_PAGED
 static
 _IRQL_requires_max_(PASSIVE_LEVEL)
 VOID
@@ -1037,6 +1041,8 @@ EnableHypervisor (
     UINT64 guestRip;
     BOOLEAN maCtxInitialized;
 
+    PAGED_CODE();
+
     maCtxInitialized = FALSE;
 
     sharedProcessorContext = Context;
@@ -1049,7 +1055,7 @@ EnableHypervisor (
     // host.
     //
     processorContext->Status = InitializeMemoryAccess(&processorContext->MemoryAccessContext,
-                                               GetHostCr3());
+                                                      GetHostCr3());
     if (MV_ERROR(processorContext->Status))
     {
         LOG_ERROR("InitializeMemoryAccess failed : %08x", processorContext->Status);
@@ -1140,6 +1146,7 @@ EnableHypervisor (
         vmxErrorStatus = (result == VmxResultErrorWithStatus) ?
             (VMX_ERROR_NUMBER)VmxRead(VMCS_VM_INSTRUCTION_ERROR) : 0;
         LOG_ERROR("__vmx_vmlaunch failed : %u", vmxErrorStatus);
+
         processorContext->Status = MV_STATUS_HV_OPERATION_FAILED;
         CleanupExtendedPageTables(&processorContext->EptContext);
         __vmx_off();
@@ -1159,8 +1166,8 @@ Exit:
 
     @details This function clears the bitmaps to avoid VM-exits that do not require
         manual handling. The MSR that requires manual handling for MiniVisor is
-        IA32_BIOS_SIGN_ID to prevent the guest from attempting update BIOS
-        microcode. See HandleMsrAccess for more details.
+        IA32_BIOS_SIGN_ID for read to prevent the guest from attempting update
+        BIOS microcode which is not allowed. See HandleMsrAccess for more details.
 
    @param[out] Bitmaps - The pointer to the MSR bitmaps to initialize.
  */
@@ -1174,7 +1181,7 @@ InitializeMsrBitmaps (
     static CONST UINT64 biosSignatureByteOffset = (IA32_BIOS_SIGN_ID / CHAR_BIT);
     static CONST UINT64 biosSignatureBitMask = (1ull << (IA32_BIOS_SIGN_ID % CHAR_BIT));
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     RtlZeroMemory(Bitmaps, sizeof(*Bitmaps));
 
@@ -1182,7 +1189,7 @@ InitializeMsrBitmaps (
 }
 
 /*!
-    @brief Enables hypervisor on the all processors.
+    @brief Enables the hypervisor on the all processors.
 
     @return MV_STATUS_SUCCESS on success; otherwise, an appropriate error code.
  */
@@ -1192,7 +1199,6 @@ _IRQL_requires_max_(PASSIVE_LEVEL)
 _Must_inspect_result_
 MV_STATUS
 EnableHypervisorOnAllProcessors (
-    VOID
     )
 {
     MV_STATUS status;
@@ -1201,7 +1207,7 @@ EnableHypervisorOnAllProcessors (
     SHARED_PROCESSOR_CONTEXT* sharedProcessorContext;
     BOOLEAN virtualized;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     virtualized = FALSE;
 
@@ -1322,7 +1328,7 @@ InitializeMiniVisor (
     //
     if (IsMiniVisorInstalled() != FALSE)
     {
-        LOG_ERROR("MiniVisor already installed");
+        LOG_INFO("MiniVisor already installed");
         status = MV_STATUS_HV_OPERATION_FAILED;
         goto Exit;
     }

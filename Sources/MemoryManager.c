@@ -10,7 +10,7 @@
 #include "MemoryManager.h"
 #include "Platform.h"
 #include "Logger.h"
-#if !defined(NTDDI_VERSION)
+#if defined(MV_PLATFORM_EFI)
 #include "Platform/EFI/EfiBitmap.h"
 #endif
 
@@ -78,7 +78,7 @@ MmInitializeMemoryManager (
     UINT32 lengthMapPagesCount;
     MEMORY_MANAGER_CONTEXT* memoryManager;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     memoryManager = &g_MemoryManager;
     lengthMapPagesCount = 0;
@@ -174,7 +174,7 @@ MmCleanupMemoryManager (
     UINT32 lengthMapPagesCount;
     MEMORY_MANAGER_CONTEXT* memoryManager;
 
-    PAGED_CODE()
+    PAGED_CODE();
 
     memoryManager = &g_MemoryManager;
 

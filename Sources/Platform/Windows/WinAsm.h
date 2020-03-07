@@ -17,7 +17,6 @@
  */
 UINT16
 AsmReadLdtr (
-    VOID
     );
 
 /*!
@@ -27,7 +26,6 @@ AsmReadLdtr (
  */
 UINT16
 AsmReadTr (
-    VOID
     );
 
 /*!
@@ -37,7 +35,6 @@ AsmReadTr (
  */
 UINT16
 AsmReadEs (
-    VOID
     );
 
 /*!
@@ -47,7 +44,6 @@ AsmReadEs (
  */
 UINT16
 AsmReadCs (
-    VOID
     );
 
 /*!
@@ -57,7 +53,6 @@ AsmReadCs (
  */
 UINT16
 AsmReadSs (
-    VOID
     );
 
 /*!
@@ -67,7 +62,6 @@ AsmReadSs (
  */
 UINT16
 AsmReadDs (
-    VOID
     );
 
 /*!
@@ -77,7 +71,6 @@ AsmReadDs (
  */
 UINT16
 AsmReadFs (
-    VOID
     );
 
 /*!
@@ -87,7 +80,6 @@ AsmReadFs (
  */
 UINT16
 AsmReadGs (
-    VOID
     );
 
 /*!

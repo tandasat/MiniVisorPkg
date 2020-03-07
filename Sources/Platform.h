@@ -13,7 +13,7 @@
 //
 // Spin lock type and state names.
 //
-#if defined(NTDDI_VERSION)
+#if defined(MV_PLATFORM_WINDOWS)
 typedef volatile LONG64 SPIN_LOCK;
 typedef enum _SPIN_LOCK_STATE
 {
@@ -81,7 +81,7 @@ GetCurrentProcessorNumber (
 /*!
     @brief Returns the physical address of the given virtual address.
 
-    @param[in] VirualAddress - A virtual address to retrieve its physical
+    @param[in] VirualAddress - The virtual address to retrieve its physical
         address for the current CR3. This must be non paged pool, otherwise the
         result is undefined.
 

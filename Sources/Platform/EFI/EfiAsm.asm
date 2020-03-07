@@ -25,7 +25,10 @@ Index = 0
 ; Index is incremented whenever this macro is used.
 ;
 INTERRUPT_HANDLER macro InterruptNumber
-        push    0       ; Push dummy error code for consistent stack layout.
+        ;
+        ; Push dummy error code for consistent stack layout.
+        ;
+        push    0
         push    InterruptNumber
         jmp     AsmCommonExceptionHandler
         Index = Index + 1
@@ -38,7 +41,10 @@ endm
 ; Index is incremented whenever this macro is used.
 ;
 INTERRUPT_HANDLER_WITH_CODE macro InterruptNumber
-        nop             ; Error code is expected to be pushed by the processor.
+        ;
+        ; Error code is expected to be pushed by the processor.
+        ;
+        nop
         nop
         push    InterruptNumber
         jmp     AsmCommonExceptionHandler
@@ -53,26 +59,44 @@ endm
 ;   works as a hendler of the corresponding interrupt/exception in the host.
 ;
 AsmDefaultExceptionHandlers proc
-    repeat 8
-        INTERRUPT_HANDLER             Index    ; INT0-7
-    endm
+        ;
+        ; INT0-7
+        ;
+        repeat 8
+        INTERRUPT_HANDLER             Index
+        endm
 
-        INTERRUPT_HANDLER_WITH_CODE   Index    ; INT8
-        INTERRUPT_HANDLER             Index    ; INT9
+        ;
+        ; INT8, INT9
+        ;
+        INTERRUPT_HANDLER_WITH_CODE   Index
+        INTERRUPT_HANDLER             Index
 
-    repeat 5
-        INTERRUPT_HANDLER_WITH_CODE   Index    ; INT10-14
-    endm
+        ;
+        ; INT10-14
+        ;
+        repeat 5
+        INTERRUPT_HANDLER_WITH_CODE   Index
+        endm
 
-    repeat 2
-        INTERRUPT_HANDLER             Index    ; INT15-16
-    endm
+        ;
+        ; INT15-16
+        ;
+        repeat 2
+        INTERRUPT_HANDLER             Index
+        endm
 
-        INTERRUPT_HANDLER_WITH_CODE   Index    ; INT17
+        ;
+        ; INT17
+        ;
+        INTERRUPT_HANDLER_WITH_CODE   Index
 
-    repeat 238
-        INTERRUPT_HANDLER             Index    ; INT18-255
-    endm
+        ;
+        ; INT18-255
+        ;
+        repeat 238
+        INTERRUPT_HANDLER             Index
+        endm
 AsmDefaultExceptionHandlers endp
 
 ;
@@ -88,7 +112,11 @@ AsmCommonExceptionHandler proc
         call    HandleHostException
         add     rsp, 20h
         POPAQ
-        add     rsp, 10h        ; Remove the error code and interrupt number.
+
+        ;
+        ; Remove the error code and interrupt number.
+        ;
+        add     rsp, 10h
         iretq
 AsmCommonExceptionHandler endp
 

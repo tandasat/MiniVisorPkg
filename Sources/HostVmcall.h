@@ -24,7 +24,7 @@ VMCALL_HANDLER (
 /*!
     @brief Handles hypercall for uninstalling the hypervisor.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 VMCALL_HANDLER HandleVmcallUninstall;
 

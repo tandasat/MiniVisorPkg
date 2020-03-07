@@ -85,9 +85,9 @@ CleanupMemoryAccess (
         given virtual address and retrieves the guest physical address of it.
         This is equivalent to changing the current CR3 with the guest CR3 and
         calling GetPhysicalAddress(). This function, however, exists to avoid
-        problems associated with CR3 update, for example, updating the CR3 crashes
-        the system immediately if the KVA Shadow is enabled and the guest CR3
-        contains the USER CR3, as it does not map our driver.
+        problems associated with CR3 update, for example, on Windows, updating
+        the CR3 crashes the system immediately if the KVA Shadow is enabled and
+        the guest CR3 contains the USER CR3, as it does not map our code.
 
     @param[in] Context - The pointer to the memory access context.
 
@@ -174,7 +174,8 @@ WriteGuestVirtualAddress (
 
     @param[in] Context - The pointer to the memory access context.
 
-    @param[in] GuestPageNumber - See ReadOrWriteGuestVirtualAddress().
+    @param[in] GuestPageNumber - The guest page number (ie, the guest virtual
+        address without lower 12bits) to map to the host address space.
 
     @return The virtual address mapping the same physical page as specified as
         the page number, or NULL if the specified page number does not have

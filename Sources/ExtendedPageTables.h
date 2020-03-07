@@ -63,9 +63,9 @@ typedef struct _EPT_CONTEXT
 } EPT_CONTEXT;
 
 /*!
-    @brief Initializes EPT with pass-through style configurations.
+    @brief Initializes identity-mapping EPTs.
 
-    @param[in,out] EptContext - A pointer to the EPT context to initialize.
+    @param[in,out] EptContext - The pointer to the EPT context to initialize.
 
     @return MV_STATUS_SUCCESS on success; otherwise, an appropriate error code.
  */
@@ -76,9 +76,9 @@ InitializeExtendedPageTables (
     );
 
 /*!
-    @brief Cleans up EPT context.
+    @brief Cleans up the EPT context.
 
-    @param[in,out] EptContext - A pointer to the EPT context to clean up.
+    @param[in,out] EptContext - The pointer to the EPT context to clean up.
  */
 VOID
 CleanupExtendedPageTables (
@@ -110,7 +110,7 @@ UpdateExtendPageTables (
     );
 
 /*!
-    @brief Invalidate guest-physical and combined caches.
+    @brief Invalidates guest-physical and combined caches.
 
     @param[in] EptPointer - The EPT pointer to invalidate associated caches. If
         0 is specified, caches associated with any EPT pointers are invalidated.
@@ -121,10 +121,10 @@ InvalidateEptDerivedCache (
     );
 
 /*!
-    @brief Invalidate liner and combined caches.
+    @brief Invalidates liner and combined caches.
 
     @param[in] VirtualProcessorId - The VPID to invalidate associated caches. If
-        0 is specified, caches associated with any VPID are invalidated.
+        0 is specified, caches associated with any VPIDs are invalidated.
  */
 VOID
 InvalidateVpidDerivedCache (

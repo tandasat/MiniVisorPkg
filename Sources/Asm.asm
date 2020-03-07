@@ -23,17 +23,17 @@ extern HandleVmExit : proc
 extern HandleVmExitFailure : proc
 
 ;
-;   @brief An entry point for the hypervisor.
+;   @brief The entry point for the hypervisor.
 ;
 ;   @details The easiest way to understand this code is to see this as an entry
 ;       point of "VM-exit handler".
 ;
 ;       Up on VM-exit, the processor starts executing this function as
-;       condifured in the VmcsHostRip field of VMCS. At this time, the processor
-;       is in the vmx-root mode, which allows the processor to execute any
-;       instructions without causing VM-exit, and the processor is not governed
-;       by EPT. The code executed from here emulates the instruction caused
-;       VM-exit by, most typically, executing the same instruction on behalf of
+;       configured in the Host RIP field of VMCS. When this function is executed,
+;       the processor is in the vmx-root mode, which allows the processor to
+;       execute any instructions without causing VM-exit, and the processor is
+;       not governed by EPT. The code executed from here most typically emulates
+;       the instruction caused VM-exit by executing the same instruction on behalf of
 ;       the guest (see HandleCpuid for example), or changing relevant processor
 ;       state and letting the guest retry, for example, handling EPT violation.
 ;
@@ -41,6 +41,8 @@ extern HandleVmExitFailure : proc
 ;       context. We also refer those code as a VM-exit handler.
 ;
 AsmHypervisorEntryPoint proc frame
+        ;
+        ; Windows-specific:
         ;
         ; Three not-well known techniques are used in this function in oder for
         ; Windbg to display the stack trace of the guest while the VM-exit
@@ -177,9 +179,8 @@ ExitVm:
 
 VmxError:
         ;
-        ; Any of VMX instructions failed. Unrecoverble. The most useful thing
-        ; to do here is probably to call a C-function that does diagnostics
-        ; like dumping VMCS.
+        ; VMRESUME or VMXOFF instruction failed. Unrecoverble. The most useful
+        ; thing to do here is to call a C-function to diagnose the issue.
         ;
         pushf
         PUSHAQ
@@ -190,11 +191,11 @@ VmxError:
 AsmHypervisorEntryPoint endp
 
 ;
-;   @brief Invalidate translations derived from EPT
+;   @brief Invalidates translations derived from EPT
 ;
-;   @param[in] RCX - A type of invalidation.
+;   @param[in] RCX - The type of invalidation.
 ;
-;   @param[in] RDX - A description of translations to invalidate.
+;   @param[in] RDX - The description of translations to invalidate.
 ;
 ;   @return An appropriate VMX_RESULT value.
 ;
@@ -221,11 +222,11 @@ ErrorWithoutCode:
 AsmInvept endp
 
 ;
-;   @brief Invalidate translations based on VPID
+;   @brief Invalidates translations based on VPID
 ;
-;   @param[in] RCX - A type of invalidation.
+;   @param[in] RCX - The type of invalidation.
 ;
-;   @param[in] RDX - A description of translations to invalidate.
+;   @param[in] RDX - The description of translations to invalidate.
 ;
 ;   @return An appropriate VMX_RESULT value.
 ;
@@ -287,9 +288,9 @@ AsmVmxCall proc
 AsmVmxCall endp
 
 ;
-;   @brief Returns the address of the return address from this function.
+;   @brief Returns the return address from this function.
 ;
-;   @return The address of the return address from this function.
+;   @return The return address from this function.
 ;
 AsmGetCurrentInstructionPointer proc
         mov     rax, [rsp]

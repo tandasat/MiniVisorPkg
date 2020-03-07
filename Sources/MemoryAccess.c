@@ -14,9 +14,9 @@
 #include "Logger.h"
 
 /*!
-    @brief Split a 2MB EPT PDE to 512 EPT PTEs.
+    @brief Splits a 2MB PDE to 512 PTEs.
 
-    @param[in,out] PdeLarge - The pointer to the 2MB EPT PDE to split.
+    @param[in,out] PdeLarge - The pointer to the 2MB PDE to split.
 
     @return MV_STATUS_SUCCESS on success; otherwise, an appropriate error code.
  */
@@ -499,11 +499,14 @@ GetPhysicalAddressForGuest (
 
 Exit:
     //
-    // Return the collected permission bits on success.
+    // Return the collected permission bits if provided.
     //
-    if ((pa != MV_INVALID_PHYSICAL_ADDRESS) &&
-        ARGUMENT_PRESENT(AggregatedPagePermissions))
+    if (ARGUMENT_PRESENT(AggregatedPagePermissions))
     {
+        if (pa == MV_INVALID_PHYSICAL_ADDRESS)
+        {
+            permission.Flags = 0;
+        }
         *AggregatedPagePermissions = permission;
     }
     return pa;

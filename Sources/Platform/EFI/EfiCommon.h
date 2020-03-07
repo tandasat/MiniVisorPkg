@@ -34,21 +34,21 @@
         fault (null pointer access) when it fires in the host code. The author
         has not been able to find out the root cause and a fix.
  */
-#if !defined(MDEPKG_NDEBUG)
+#if defined(MDEPKG_NDEBUG)
+#define MV_ASSERT(x)
+#else
 #define MV_ASSERT(x) \
     if (!(x)) \
     { \
         LOG_ERROR("ASSERT %a(%d): %a", __FILE__, __LINE__, #x); \
         MV_PANIC(); \
     } (VOID*)NULL
-#else
-#define MV_ASSERT(x)
 #endif
 
-#if !defined(MDEPKG_NDEBUG)
-#define MV_VERIFY(x)        MV_ASSERT(x)
-#else
+#if defined(MDEPKG_NDEBUG)
 #define MV_VERIFY(x)        (x)
+#else
+#define MV_VERIFY(x)        MV_ASSERT(x)
 #endif
 
 #define MV_MAX(x, y)        MAX((x), (y))

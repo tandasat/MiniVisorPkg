@@ -16,6 +16,8 @@
 #include "HostNesting.h"
 
 //
+// Windows-specific:
+//
 // The trap frame structure for x64 systems. This is structure is used to help
 // Windbg to construct call stack while VM-exit handlers are being executed.
 // Since this is for Windbg, this is a Windows specific structure, and its
@@ -53,7 +55,7 @@ typedef struct _INITIAL_HYPERVISOR_STACK
         can check the exception is #GP(0) caused by RDMSR or WRMSR, and if this
         is the case, inject it to the guest.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
 
     @param[in] OperationType - The type of the operation.
  */
@@ -110,7 +112,7 @@ HandleMsrAccess (
 /*!
     @brief Handles VM-exit due to execution of the RDMSR instruction.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -124,7 +126,7 @@ HandleMsrRead (
 /*!
     @brief Handles VM-exit due to execution of the WRMSR instruction.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -138,7 +140,7 @@ HandleMsrWrite (
 /*!
     @brief Handles VM-exit due to execution of the CPUID instruction.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -208,7 +210,7 @@ HandleCpuid (
 /*!
     @brief Handles VM-exit due to execution of the VMCALL instruction.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -245,7 +247,7 @@ Exit:
 /*!
     @brief Handles VM-exit due to execution of the XSETBV instruction.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -275,7 +277,7 @@ HandleXsetbv (
     @brief Returns the address of where the guest general purpose register that
         corresponds to the given index is stored.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
 
     @param[in] RegisterIndex - The index provided by VMCS up on VM-exit.
 
@@ -318,7 +320,7 @@ SelectEffectiveRegister (
 /*!
     @brief Handles VM-exit due to execution of access to the control register.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -382,7 +384,7 @@ HandleCrAccess (
 /*!
     @brief Handles VM-exit due to EPT violation.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -408,7 +410,7 @@ HandleEptViolation (
 /*!
     @brief Handles VM-exit due to EPT misconfiguration.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -444,7 +446,12 @@ HandleEptMisconfig (
 /*!
     @brief Handles VM-exit due to interrupt or exception.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @details Currently, this handler is specialized for skipping main initialization
+        of PatchGuard for the demo purpose. When #DE occurs with the guest state
+        that seems to be the trigger of PatchGuard initialization, suppress it.
+        Otherwise, just inject the exception (pass-through).
+
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -455,11 +462,6 @@ HandleExceptionOrNmi (
     static BOOLEAN isKeInitAmd64SpecificStateCalled;
     VMEXIT_INTERRUPT_INFORMATION interruptInfo;
 
-    //
-    // This handler is specialized for skipping main initialization of PatchGuard.
-    // When #DE occurs with the guest state that seems to be during initialization
-    // of PatchGuard, suppress it. Otherwise, just inject the exception (pass-through).
-    //
     interruptInfo.Flags = (UINT32)VmxRead(VMCS_VMEXIT_INTERRUPTION_INFORMATION);
     MV_ASSERT(interruptInfo.InterruptionType == HardwareException);
     MV_ASSERT(interruptInfo.Vector == DivideError);
@@ -513,7 +515,7 @@ Exit:
 /*!
     @brief Handles VM-exit due to the INIT signal.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -673,7 +675,7 @@ HandleInitSignal (
 /*!
     @brief Handles VM-exit due to the Startup-IPI (SIPI) signal.
 
-    @param[in,out] GuestContext - A pointer to the guest context.
+    @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
 VOID
@@ -738,12 +740,12 @@ HandleStartupIpi (
         Any hypervisor code including this and the AsmHypervisorEntryPoint
         functions are executed while interrupt is disabled via RFLAGS.IF being
         0 (See: 27.5.3 Loading Host RIP, RSP, and RFLAGS). This means IPI, if
-        requested, is never delivered and causes deadlock. This condition is
-        essentially equal to IRQL being HIGH_LEVEL (i.e., at a higher IRQL than
-        IPI_LEVEL), and so, it is unsafe to call any Windows provided API that
-        is not stated as callable at HIGH_LEVEL.
+        requested, is never delivered and causes deadlock. In the Windows
+        terminology, this condition is essentially equal to IRQL being HIGH_LEVEL
+        (i.e., at a higher IRQL than IPI_LEVEL), and so, it is unsafe to call any
+        Windows provided API that is not stated as callable at HIGH_LEVEL.
 
-    @param[in,out] Stack - A pointer to the hypervisor stack containing the
+    @param[in,out] Stack - The pointer to the hypervisor stack containing the
         guest register values.
 
     @return TRUE when virtualization should continue and the VMRESUME instruction
@@ -785,6 +787,8 @@ HandleVmExit (
     guestContext.VmcsBasedRegisters.Rsp = VmxRead(VMCS_GUEST_RSP);
     guestContext.VmcsBasedRegisters.Rip = VmxRead(VMCS_GUEST_RIP);
 
+    //
+    // Windows-specific:
     //
     // Update the _KTRAP_FRAME structure values in hypervisor stack, so that
     // Windbg can reconstruct call stack of the guest during debug session.
@@ -903,7 +907,7 @@ typedef struct _EXCEPTION_STACK
 
     @details On Windows, this function is unused because the host uses the same
         IDT as that of the guest. All interrupts and exceptions are handled by
-        the NT kernel.
+        the NT kernel allowing Windbg to work as usual.
 
     @param[in] Stack - The pointer to the hypervisor stack containing the
         guest register values.
