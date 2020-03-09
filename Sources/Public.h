@@ -41,7 +41,11 @@ typedef struct _HYPERVISOR_CONTEXT
     //
     UINT32 ProcessorNumber;
     UINT32 Padding1;
-    UINT64 Padding2;
+
+    //
+    // The pointer to the MSR bitmaps that are shared across processor.
+    //
+    struct _MSR_BITMAPS* SharedMsrBitmaps;
 
     //
     // A pointer to the shared processor context. This value is not used by the

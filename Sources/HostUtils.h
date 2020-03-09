@@ -231,3 +231,24 @@ FindImageBase (
     _In_ GUEST_CONTEXT* GuestContext,
     _In_ UINT64 GuestVirtualAddress
     );
+
+/*!
+    @brief Updates the MSR bitmap as specified.
+
+    @param[in] Bitmaps - The pointer to the MSR bitmaps.
+
+    @param[in,out] Msr - The MSR to change configurations. Must be in the range of
+        0x0 - 0x1fff or 0xc0000000 - 0xc0001fff.
+
+    @param[in] InterOperation - The type of operation to change configurations.
+
+    @param[in] Intercept - TRUE if the hypervisor should intercept the specified
+        type of access.
+ */
+VOID
+UpdateMsrBitmaps (
+    _Inout_ MSR_BITMAPS* Bitmaps,
+    _In_ IA32_MSR_ADDRESS Msr,
+    _In_ OPERATION_TYPE InterOperation,
+    _In_ BOOLEAN Intercept
+    );

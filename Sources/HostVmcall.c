@@ -43,7 +43,7 @@ HandleVmcallUninstall (
     //
     gdtr.BaseAddress = VmxRead(VMCS_GUEST_GDTR_BASE);
     gdtr.Limit = (UINT16)VmxRead(VMCS_GUEST_GDTR_LIMIT);
-    _sgdt(&gdtr);
+    _lgdt(&gdtr);
 
     idtr.BaseAddress = VmxRead(VMCS_GUEST_IDTR_BASE);
     idtr.Limit = (UINT16)VmxRead(VMCS_GUEST_IDTR_LIMIT);

@@ -123,12 +123,12 @@ AsmHypervisorEntryPoint proc frame
         ;
         ; Restore XMM registers.
         ;
-        movaps  xmm0, xmmword ptr [rsp +  0h]
-        movaps  xmm1, xmmword ptr [rsp + 10h]
-        movaps  xmm2, xmmword ptr [rsp + 20h]
-        movaps  xmm3, xmmword ptr [rsp + 30h]
-        movaps  xmm4, xmmword ptr [rsp + 40h]
         movaps  xmm5, xmmword ptr [rsp + 50h]
+        movaps  xmm4, xmmword ptr [rsp + 40h]
+        movaps  xmm3, xmmword ptr [rsp + 30h]
+        movaps  xmm2, xmmword ptr [rsp + 20h]
+        movaps  xmm1, xmmword ptr [rsp + 10h]
+        movaps  xmm0, xmmword ptr [rsp +  0h]
         add     rsp, 68h
 
         ;
@@ -182,7 +182,7 @@ VmxError:
         ; VMRESUME or VMXOFF instruction failed. Unrecoverble. The most useful
         ; thing to do here is to call a C-function to diagnose the issue.
         ;
-        pushf
+        pushfq
         PUSHAQ
         mov     rcx, rsp
         sub     rsp, 20h

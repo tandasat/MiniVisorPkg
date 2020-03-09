@@ -996,6 +996,7 @@ SetupVmcs (
     // Finally, place necessary data for hypervisor into the hypervisor stack.
     //
     ProcessorContext->HypervisorStack.u.Layout.Context.ProcessorNumber = GetCurrentProcessorNumber();
+    ProcessorContext->HypervisorStack.u.Layout.Context.SharedMsrBitmaps = &SharedProcessorContext->MsrBitmaps;
     ProcessorContext->HypervisorStack.u.Layout.Context.SharedProcessorContext = SharedProcessorContext;
     ProcessorContext->HypervisorStack.u.Layout.Context.EptContext = &ProcessorContext->EptContext;
     ProcessorContext->HypervisorStack.u.Layout.Context.MemoryAccessContext = &ProcessorContext->MemoryAccessContext;
@@ -1178,14 +1179,28 @@ InitializeMsrBitmaps (
     _Out_ MSR_BITMAPS* Bitmaps
     )
 {
-    static CONST UINT64 biosSignatureByteOffset = (IA32_BIOS_SIGN_ID / CHAR_BIT);
-    static CONST UINT64 biosSignatureBitMask = (1ull << (IA32_BIOS_SIGN_ID % CHAR_BIT));
+    typedef struct _INTERCEPT_MSR_REGISTRATION
+    {
+        IA32_MSR_ADDRESS Msr;
+        OPERATION_TYPE InterceptType;
+    } INTERCEPT_MSR_REGISTRATION;
+
+    static CONST INTERCEPT_MSR_REGISTRATION registrations[] =
+    {
+        { IA32_BIOS_SIGN_ID, OperationRead, },
+    };
 
     PAGED_CODE();
 
     RtlZeroMemory(Bitmaps, sizeof(*Bitmaps));
 
-    Bitmaps->ReadBitmapLow[biosSignatureByteOffset] |= biosSignatureBitMask;
+    for (int i = 0; i < RTL_NUMBER_OF(registrations); ++i)
+    {
+        UpdateMsrBitmaps(Bitmaps,
+                         registrations[i].Msr,
+                         registrations[i].InterceptType,
+                         TRUE);
+    }
 }
 
 /*!

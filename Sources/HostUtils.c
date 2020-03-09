@@ -421,13 +421,16 @@ FindImageBase (
     UINT64 GuestVirtualAddress
     )
 {
+    UINT64 imageBase;
+
     //
-    // Starting with the 1MB aligned address, and search up IMAGE_DOS_SIGNATURE
-    // every 1MB.
+    // Starting with the page aligned address, and search up IMAGE_DOS_SIGNATURE
+    // every page up to 16MB (0x1000000). Ntoskrnl.exe can be mapped at the page
+    // boundary and not the 64KB boundary unlike other images.
     //
-    for (UINT64 imageBase = (GuestVirtualAddress & ~(0x10000 - 1));
-         /**/;
-         imageBase -= 0x10000)
+    imageBase = (GuestVirtualAddress & ~(PAGE_SIZE - 1));
+
+    for (int i = 0; i < 0x1000; i++, imageBase -= PAGE_SIZE)
     {
         BOOLEAN ok;
         UINT16 contents;
@@ -441,12 +444,90 @@ FindImageBase (
                                      &errorInfo);
         if (ok == FALSE)
         {
-            return 0;
+            continue;
         }
 
         if (contents == 0x5A4D)
         {
-            return imageBase;
+            goto Exit;
         }
+    }
+
+    imageBase = 0;
+
+Exit:
+    return imageBase;
+}
+
+_Use_decl_annotations_
+VOID
+UpdateMsrBitmaps (
+    MSR_BITMAPS* Bitmaps,
+    IA32_MSR_ADDRESS Msr,
+    OPERATION_TYPE InterOperation,
+    BOOLEAN Intercept
+    )
+{
+    IA32_MSR_ADDRESS msrTemp;
+    BOOLEAN highValue;
+    UINT64 byteOffset;
+    UINT64 bitMask;
+    UINT8* msrBitmap;
+
+    //
+    // MSR must be within either 0x0 - 0x1fff or 0xc0000000 - 0xc0001fff
+    // inclusive, and at least read or write intercept must be specified.
+    //
+    MV_ASSERT((Msr <= 0x1fff) ||
+              ((Msr >= 0xc0000000) && (Msr <= 0xc0001fff)));
+
+    //
+    // Check if the MSR belongs to high bitmaps.
+    //
+    highValue = BooleanFlagOn(Msr, 0xc0000000);
+
+    //
+    // Computes offsets and bitmaps to update the bitmaps.
+    //
+    msrTemp = (Msr & ~0xc0000000);
+    byteOffset = (msrTemp / CHAR_BIT);
+    bitMask = (1ull << (msrTemp % CHAR_BIT));
+
+    //
+    // Select the bitmap to work on.
+    //
+    if (InterOperation == OperationRead)
+    {
+        if (highValue == FALSE)
+        {
+            msrBitmap = Bitmaps->ReadBitmapLow;
+        }
+        else
+        {
+            msrBitmap = Bitmaps->ReadBitmapHigh;
+        }
+    }
+    else
+    {
+        if (highValue == FALSE)
+        {
+            msrBitmap = Bitmaps->WriteBitmapLow;
+        }
+        else
+        {
+            msrBitmap = Bitmaps->WriteBitmapHigh;
+        }
+    }
+
+    //
+    // Set of clear the bit.
+    //
+    if (Intercept != FALSE)
+    {
+        SetFlag(msrBitmap[byteOffset], bitMask);
+    }
+    else
+    {
+        ClearFlag(msrBitmap[byteOffset], bitMask);
     }
 }
