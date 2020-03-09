@@ -67,6 +67,7 @@ unsigned __int64 __readcr0(void);
 unsigned __int64 __readcr2(void);
 unsigned __int64 __readcr3(void);
 unsigned __int64 __readcr4(void);
+unsigned __int64 __readcr8(void);
 unsigned __int64 __readdr(unsigned int);
 unsigned __int64 __readeflags(void);
 unsigned __int64 __readmsr(unsigned long);
@@ -80,6 +81,7 @@ unsigned char __vmx_vmwrite(unsigned __int64, unsigned __int64);
 unsigned long __segmentlimit(unsigned long);
 void __cpuid(int[4], int);
 void __cpuidex(int[4], int, int);
+void __debugbreak(void);
 void __invlpg(void *);
 void __lidt(void *);
 void __sidt(void *);
@@ -92,9 +94,17 @@ void __writecr3(unsigned __int64);
 void __writecr4(unsigned __int64);
 void __writedr(unsigned int, unsigned __int64);
 void __writemsr(unsigned long, unsigned __int64);
+void _disable(void);
+void _enable(void);
 void _lgdt(void *);
 void _sgdt(void *);
 void _xsetbv(unsigned int, unsigned __int64);
+
+//
+// Required. Otherwise, link error occurs.
+//
+#pragma intrinsic(_disable)
+#pragma intrinsic(_enable)
 
 //
 // MSVC compatibility macro definitions.
@@ -102,11 +112,13 @@ void _xsetbv(unsigned int, unsigned __int64);
 #define __drv_aliasesMem
 #define __drv_allocatesMem(x)
 #define __drv_freesMem(x)
+#define __drv_strictTypeMatch(x)
 #define _Acquires_lock_(x)
 #define _In_
 #define _In_opt_
 #define _In_range_(x, y)
 #define _In_reads_bytes_(x)
+#define _In_z_
 #define _Inout_
 #define _IRQL_raises_(x)
 #define _IRQL_requires_max_(x)

@@ -39,8 +39,8 @@
   ../../../Sources/MiniVisor.c
   ../../../Sources/MiniVisor.h
   ../../../Sources/Platform.h
-  ../../../Sources/Utils.c
-  ../../../Sources/Utils.h
+  ../../../Sources/Ia32Utils.c
+  ../../../Sources/Ia32Utils.h
   ../../../Sources/Ia32.h
   ../../../Sources/Asm.asm
   ../../../Sources/Asm.h

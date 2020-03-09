@@ -1,5 +1,5 @@
 /*!
-    @file Utils.c
+    @file Ia32Utils.c
 
     @brief Utility functions that could be used by both the host and non-host.
 
@@ -7,7 +7,7 @@
 
     @copyright Copyright (c) 2020 - , Satoshi Tanda. All rights reserved.
  */
-#include "Utils.h"
+#include "Ia32Utils.h"
 #include "Asm.h"
 #include "Logger.h"
 

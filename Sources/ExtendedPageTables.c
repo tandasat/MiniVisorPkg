@@ -14,7 +14,7 @@
 #include "Platform.h"
 #include "Logger.h"
 #include "MemoryType.h"
-#include "Utils.h"
+#include "Ia32Utils.h"
 
 //
 // The set of EPT paging structure entries involved with to translate the GPA.

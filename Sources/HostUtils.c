@@ -10,7 +10,7 @@
 #include "HostUtils.h"
 #include "Logger.h"
 #include "ExtendedPageTables.h"
-#include "Utils.h"
+#include "Ia32Utils.h"
 #include "MemoryAccess.h"
 
 /*!

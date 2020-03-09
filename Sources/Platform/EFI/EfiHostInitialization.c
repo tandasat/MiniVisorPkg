@@ -33,7 +33,7 @@
 #include "EfiHostInitialization.h"
 #include "EfiAsm.h"
 #include "EfiPlatform.h"
-#include "../../Utils.h"
+#include "../../Ia32Utils.h"
 #include "EfiLogger.h"
 
 //

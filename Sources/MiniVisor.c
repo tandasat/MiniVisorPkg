@@ -17,7 +17,7 @@
 #include "Public.h"
 #include "MemoryType.h"
 #include "HostNesting.h"
-#include "Utils.h"
+#include "Ia32Utils.h"
 #include "MemoryAccess.h"
 
 //

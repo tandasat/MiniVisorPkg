@@ -133,7 +133,7 @@
     <ClInclude Include="Platform\Windows\WinLogger.h" />
     <ClInclude Include="Platform\Windows\WinPlatform.h" />
     <ClInclude Include="Public.h" />
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="Ia32Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ExtendedPageTables.c" />
@@ -165,7 +165,7 @@
     <ClCompile Include="Platform\Windows\WinPlatform.c">
       <ExcludedFromBuild Condition="'$(Configuration)'=='UEFI'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Utils.c" />
+    <ClCompile Include="Ia32Utils.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AsmCommon.inc" />

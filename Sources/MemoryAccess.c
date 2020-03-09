@@ -87,7 +87,7 @@ Exit:
         paging structures of the returned entry.
 
     @return The pointer to the final paging structure when the virtual address
-        is not mapped in the physical address. If not, returns the pointer to the
+        is mapped in the physical address. If not, returns the pointer to the
         paging structure entry that indicated that the page is not present (ie,
         the Present bit is cleared).
  */

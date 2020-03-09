@@ -1,5 +1,5 @@
 /*!
-    @file Utils.h
+    @file Ia32Utils.h
 
     @brief Utility functions that could be used by both the host and non-host.
 
