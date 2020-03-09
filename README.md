@@ -51,9 +51,10 @@ While this project does not implement or designed for any immediately useful fea
 * No need of disabling Hyper-V (Virtualization Based Security) to run the custom hypervisor
 * No need of enabling the test-signing mode
 * Zero direct indicator of existence of the hypervisor from operating system perspective
-* Installing hooks during the early boot phase and letting PatchGuard to protect them
 * Detecting bootkit and early system modification
 * Implementing operating system agnostic solutions
+* Installing hooks during the early boot phase and letting PatchGuard to protect them
+  ![Readme_Showcase4.jpg](Docs/Resources/Readme_Showcase4.jpg)
 
 Acknowledgments
 ----------------
