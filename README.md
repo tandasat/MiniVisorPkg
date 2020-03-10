@@ -60,7 +60,7 @@ Acknowledgments
 ----------------
 
 The authors thank for creators and maintainers of the following projects:
-* [Bareflank](https://github.com/Bareflank/hypervisor) and [STM](https://github.comjyao1/STM) -- for publishing UEFI-base hypervisors with the relatively small codebase.
+* [Bareflank](https://github.com/Bareflank/hypervisor) and [STM](https://github.com/jyao1/STM) -- for publishing UEFI-base hypervisors with the relatively small codebase.
 * [zpp_hypervisor](https://github.com/eyalz800/zpp_hypervisor) -- for making me realize that writing UEFI-based hypervisors is viable.
 * [EfiGuard](https://github.com/Mattiwatti/EfiGuard) -- for clean codebase and rich documentation for UEFI development newbies.
 * [hvpp](https://github.com/wbenny/hvpp) -- for few techniques required for the UEFI environment.
