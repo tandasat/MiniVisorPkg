@@ -1,7 +1,7 @@
 [Defines]
   DEC_SPECIFICATION              = 1.27
   PACKAGE_NAME                   = MiniVisorPkg
-  PACKAGE_GUID                   = 6BFA833B-A9DF-490D-AF7E-7F92A80E3F9A
+  PACKAGE_GUID                   = 17B17324-C05D-4F94-BE73-46D4077E3E4C
   PACKAGE_VERSION                = 1.00
 
 [Includes]

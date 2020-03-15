@@ -1,7 +1,7 @@
 [Defines]
   DSC_SPECIFICATION              = 1.28
   PLATFORM_NAME                  = MiniVisor
-  PLATFORM_GUID                  = C5ACE17D-FD90-44F7-847C-693ED2B8BEF9
+  PLATFORM_GUID                  = F12E3CB1-C7C0-4EED-9E78-D144A1A09F98
   PLATFORM_VERSION               = 1.00
   OUTPUT_DIRECTORY               = Build/MiniVisor
   SUPPORTED_ARCHITECTURES        = X64

@@ -1,7 +1,7 @@
 [Defines]
   INF_VERSION                    = 1.27
   BASE_NAME                      = MiniVisorDxe
-  FILE_GUID                      = 503682AC-F01E-4D10-AAE3-BE5A90A563E7
+  FILE_GUID                      = 431B242C-8D1B-497F-AC69-352BB4713525
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = DriverEntry
