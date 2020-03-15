@@ -163,3 +163,8 @@ typedef struct _MSR_BITMAPS
     UINT8 WriteBitmapHigh[1024];
 } MSR_BITMAPS;
 C_ASSERT(sizeof(MSR_BITMAPS) == PAGE_SIZE);
+
+//
+// ia32.h does not include a EXCEPTION_VECTOR definition for NMI. Add this.
+//
+#define Nmi     (EXCEPTION_VECTOR)2

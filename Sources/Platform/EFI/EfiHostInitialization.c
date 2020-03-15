@@ -156,8 +156,7 @@ InitializeHostPagingStructures (
     @brief Initializes the host IDT.
 
     @details This function fills out the IDT with AsmDefaultExceptionHandlers[N]
-        where N is the interrupt number, updates IDT[2] with AsmNmiExceptionHandler,
-        and initializes IDTR to point to the IDT.
+        where N is the interrupt number and initializes IDTR to point to the IDT.
 
         AsmDefaultExceptionHandlers is the array of stub functions to transfer
         execution to the main common logic in AsmCommonExceptionHandler.
@@ -208,13 +207,6 @@ InitializeHostIdt (
         g_HostIdt[i].SegmentSelector = AsmReadCs();
         g_HostIdt[i].GateType = 0x8E;
     }
-
-    //
-    // Interrupt 0x2 is NMI. This needs special handling.
-    //
-    g_HostIdt[2].Offset15To0 = (UINT16)((UINT64)&AsmNmiExceptionHandler);
-    g_HostIdt[2].Offset31To16 = (UINT16)((UINT64)&AsmNmiExceptionHandler >> 16);
-    g_HostIdt[2].Offset63To32 = (UINT32)((UINT64)&AsmNmiExceptionHandler >> 32);
 
     //
     // Finally initialize the IDTR to point to the IDT.

@@ -16,10 +16,3 @@
 VOID
 AsmDefaultExceptionHandlers (
     );
-
-/*!
-    @brief The host NMI handler.
- */
-VOID
-AsmNmiExceptionHandler (
-    );

@@ -120,14 +120,4 @@ AsmCommonExceptionHandler proc
         iretq
 AsmCommonExceptionHandler endp
 
-;
-; @brief The NMI handler for the host.
-;
-; @details This implementation is incomplete. When NMI occurs while the host is
-;   executed, it should be injected to the guest.
-;
-AsmNmiExceptionHandler proc
-        iretq
-AsmNmiExceptionHandler endp
-
         end

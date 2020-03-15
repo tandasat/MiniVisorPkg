@@ -917,6 +917,15 @@ HandleHostException (
     _In_ CONST EXCEPTION_STACK* Stack
     )
 {
+    //
+    // Drop NMI occurred during the VMX root mode. This implementation is
+    // incomplete, and NMI should be injected to the guest.
+    //
+    if (Stack->InterruptNumber == Nmi)
+    {
+        return;
+    }
+
     DumpGuestState();
     DumpHostState();
     DumpControl();
