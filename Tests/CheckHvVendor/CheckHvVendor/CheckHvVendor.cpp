@@ -39,10 +39,7 @@ get_logical_processor_count (
     )
 {
 #if defined(WINDOWS)
-    SYSTEM_INFO systemInfo;
-
-    GetSystemInfo(&systemInfo);
-    return systemInfo.dwNumberOfProcessors;
+    return GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
 #elif defined(LINUX)
     return get_nprocs();
 #endif
