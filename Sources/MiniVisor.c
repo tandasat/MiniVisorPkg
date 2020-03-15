@@ -866,20 +866,13 @@ SetupVmcs (
     //  RPL (bits 1:0) and the TI flag (bit 2) must be 0"
     // See: 26.2.3 Checks on Host Segment and Descriptor-Table Registers
     //
-    MV_ASSERT(FlagOn(AsmReadEs(), hostSegmentSelectorMask) == FALSE);
-    MV_ASSERT(FlagOn(AsmReadCs(), hostSegmentSelectorMask) == FALSE);
-    MV_ASSERT(FlagOn(AsmReadSs(), hostSegmentSelectorMask) == FALSE);
-    MV_ASSERT(FlagOn(AsmReadDs(), hostSegmentSelectorMask) == FALSE);
-    MV_ASSERT(FlagOn(AsmReadFs(), hostSegmentSelectorMask) == FALSE);
-    MV_ASSERT(FlagOn(AsmReadGs(), hostSegmentSelectorMask) == FALSE);
-    MV_ASSERT(FlagOn(AsmReadTr(), hostSegmentSelectorMask) == FALSE);
-    VmxWrite(VMCS_HOST_ES_SELECTOR, AsmReadEs());
-    VmxWrite(VMCS_HOST_CS_SELECTOR, AsmReadCs());
-    VmxWrite(VMCS_HOST_SS_SELECTOR, AsmReadSs());
-    VmxWrite(VMCS_HOST_DS_SELECTOR, AsmReadDs());
-    VmxWrite(VMCS_HOST_FS_SELECTOR, AsmReadFs());
-    VmxWrite(VMCS_HOST_GS_SELECTOR, AsmReadGs());
-    VmxWrite(VMCS_HOST_TR_SELECTOR, AsmReadTr());
+    VmxWrite(VMCS_HOST_ES_SELECTOR, AsmReadEs() & ~hostSegmentSelectorMask);
+    VmxWrite(VMCS_HOST_CS_SELECTOR, AsmReadCs() & ~hostSegmentSelectorMask);
+    VmxWrite(VMCS_HOST_SS_SELECTOR, AsmReadSs() & ~hostSegmentSelectorMask);
+    VmxWrite(VMCS_HOST_DS_SELECTOR, AsmReadDs() & ~hostSegmentSelectorMask);
+    VmxWrite(VMCS_HOST_FS_SELECTOR, AsmReadFs() & ~hostSegmentSelectorMask);
+    VmxWrite(VMCS_HOST_GS_SELECTOR, AsmReadGs() & ~hostSegmentSelectorMask);
+    VmxWrite(VMCS_HOST_TR_SELECTOR, AsmReadTr() & ~hostSegmentSelectorMask);
 
     /* 64-Bit Host-State Fields */
     VmxWrite(VMCS_HOST_EFER, __readmsr(IA32_EFER));
