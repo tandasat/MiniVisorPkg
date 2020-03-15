@@ -463,53 +463,59 @@ HandleExceptionOrNmi (
     VMEXIT_INTERRUPT_INFORMATION interruptInfo;
 
     interruptInfo.Flags = (UINT32)VmxRead(VMCS_VMEXIT_INTERRUPTION_INFORMATION);
-    MV_ASSERT(interruptInfo.InterruptionType == HardwareException);
-    MV_ASSERT(interruptInfo.Vector == DivideError);
 
-    //
-    // The below check detects division that will trigger initialization of
-    // PatchGuard. The very instruction is this on all versions of Windows.
-    //  idiv r8d
-    // The IDIV instruction in this form performs (int64)edx:eax / (int32)r8d,
-    // and cases #DE, in particular when a positive result is greater than
-    // 0x7fffffff. If the kernel debugger is not attached and disabled, the NT
-    // kernel executes this instruction with the following values, resulting in
-    // the #DE.
-    //  ((int64)0xffffffff80000000 / -1) => 0x80000000
-    // When this condition is detected for the first time, we do not inject #DE
-    // to the guest to avoid initialization of main PatchGuard logic.
-    //
-    if ((isKeInitAmd64SpecificStateCalled == FALSE) &&
-        ((UINT32)GuestContext->StackBasedRegisters->Rax == (UINT32)0x80000000) &&
-        ((UINT32)GuestContext->StackBasedRegisters->Rdx == (UINT32)0xffffffff) &&
-        ((UINT32)GuestContext->StackBasedRegisters->R8 ==  (UINT32)-1))
+    switch (interruptInfo.Vector)
     {
-        UINT64 ntoskrnlBase;
+    case DivideError:
+        MV_ASSERT(interruptInfo.InterruptionType == HardwareException);
 
         //
-        // Just as an example of how to access the guest virtual address, search
-        // the base address of the NT kernel and print it out.
+        // The below check detects division that will trigger initialization of
+        // PatchGuard. The very instruction is this on all versions of Windows.
+        //  idiv r8d
+        // The IDIV instruction in this form performs (int64)edx:eax / (int32)r8d,
+        // and cases #DE, in particular when a positive result is greater than
+        // 0x7fffffff. If the kernel debugger is not attached and disabled, the NT
+        // kernel executes this instruction with the following values, resulting in
+        // the #DE.
+        //  ((int64)0xffffffff80000000 / -1) => 0x80000000
+        // When this condition is detected for the first time, we do not inject #DE
+        // to the guest to avoid initialization of main PatchGuard logic.
         //
-        ntoskrnlBase = FindImageBase(GuestContext, GuestContext->VmcsBasedRegisters.Rip);
-        if (ntoskrnlBase != 0)
+        if ((isKeInitAmd64SpecificStateCalled == FALSE) &&
+            ((UINT32)GuestContext->StackBasedRegisters->Rax == (UINT32)0x80000000) &&
+            ((UINT32)GuestContext->StackBasedRegisters->Rdx == (UINT32)0xffffffff) &&
+            ((UINT32)GuestContext->StackBasedRegisters->R8 ==  (UINT32)-1))
         {
-            LOG_INFO("Found ntoskrnl.exe at %016llx", ntoskrnlBase);
+            UINT64 ntoskrnlBase;
+
+            //
+            // Just as an example of how to access the guest virtual address, search
+            // the base address of the NT kernel and print it out.
+            //
+            ntoskrnlBase = FindImageBase(GuestContext, GuestContext->VmcsBasedRegisters.Rip);
+            if (ntoskrnlBase != 0)
+            {
+                LOG_INFO("Found ntoskrnl.exe at %016llx", ntoskrnlBase);
+            }
+
+            LOG_INFO("KeInitAmd64SpecificState triggered #DE");
+            LOG_INFO("Skipping main PatchGuard initialization.");
+            isKeInitAmd64SpecificStateCalled = TRUE;
+            AdvanceGuestInstructionPointer(GuestContext);
         }
+        else
+        {
+            //
+            // Otherwise, just forward the exception.
+            //
+            InjectInterruption(interruptInfo.InterruptionType, interruptInfo.Vector, FALSE, 0);
+        }
+        break;
 
-        LOG_INFO("KeInitAmd64SpecificState triggered #DE");
-        LOG_INFO("Skipping main PatchGuard initialization.");
-        isKeInitAmd64SpecificStateCalled = TRUE;
-        AdvanceGuestInstructionPointer(GuestContext);
-        goto Exit;
+    default:
+        MV_PANIC();
     }
-
-    //
-    // Otherwise, just forward the exception.
-    //
-    InjectInterruption(interruptInfo.InterruptionType, interruptInfo.Vector, FALSE, 0);
-
-Exit:
-    return;
 }
 
 /*!
