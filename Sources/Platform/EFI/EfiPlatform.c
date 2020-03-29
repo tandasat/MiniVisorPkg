@@ -247,6 +247,7 @@ GetActiveProcessorCount (
                                                  &numberOfEnabledProcessors);
     if (EFI_ERROR(status))
     {
+        LOG_ERROR("GetNumberOfProcessors failed : %r", status);
         MV_PANIC();
     }
 
@@ -263,6 +264,7 @@ GetCurrentProcessorNumber (
     status = g_MpServices->WhoAmI(g_MpServices, &processorNumber);
     if (EFI_ERROR(status))
     {
+        LOG_ERROR("WhoAmI failed : %r", status);
         MV_PANIC();
     }
 
@@ -360,6 +362,7 @@ RunOnAllProcessors (
                                          NULL);
     if (EFI_ERROR(status))
     {
+        LOG_ERROR("StartupAllAPs failed : %r", status);
         MV_PANIC();
     }
 
