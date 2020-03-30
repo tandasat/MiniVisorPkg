@@ -85,3 +85,12 @@ VOID
 CleanupGdt (
     _In_ CONST GDTR* OriginalGdtr
     );
+
+/*!
+    @brief Checks additional VMX feature availability for the platform.
+
+    @return Whether sufficient VMX features are supported.
+ */
+BOOLEAN
+IsVmxAvailableEx (
+    );

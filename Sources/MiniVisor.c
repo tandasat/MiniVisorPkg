@@ -488,7 +488,6 @@ IsVmxAvailable (
     IA32_VMX_BASIC_REGISTER vmxBasicMsr;
     IA32_FEATURE_CONTROL_REGISTER vmxFeatureControlMsr;
     IA32_VMX_EPT_VPID_CAP_REGISTER eptVpidCapabilityMsr;
-    IA32_VMX_MISC_REGISTER vmxMiscMsr;
 
     vmxAvailable = FALSE;
 
@@ -560,32 +559,9 @@ IsVmxAvailable (
     }
 
     //
-    // We need "unrestricted guest" and this bit indicates availability of it.
+    // Finally, check the platform specific requirements.
     //
-    vmxMiscMsr.Flags = __readmsr(IA32_VMX_MISC);
-    if (vmxMiscMsr.StoreEferLmaOnVmexit == FALSE)
-    {
-        LOG_ERROR("Missing required misc feature(s) : %016llx", vmxMiscMsr.Flags);
-        goto Exit;
-    }
-
-    //
-    // We requires support of the wait-for-SIPI state on a MP system. Some VM like
-    // QEMU+KVM does not support this. Checked only on the BPS once.
-    //
-    // "Bit 8 reports (if set) the support for activity state 3 (wait-for-SIPI)."
-    // See: A.6 MISCELLANEOUS DATA
-    //
-    if ((GetCurrentProcessorNumber() == 0) &&
-        (GetActiveProcessorCount() > 1) &&
-        !BooleanFlagOn(vmxMiscMsr.ActivityStates, 1 << 2))
-    {
-        LOG_ERROR("Missing required multi processor related feature: %016llx", vmxMiscMsr.Flags);
-        LOG_ERROR("Configure the system to be a single processor.");
-        goto Exit;
-    }
-
-    vmxAvailable = TRUE;
+    vmxAvailable = IsVmxAvailableEx();
 
 Exit:
     return vmxAvailable;

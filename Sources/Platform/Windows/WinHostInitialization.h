@@ -8,4 +8,4 @@
     @copyright Copyright (c) 2020 - , Satoshi Tanda. All rights reserved.
  */
 #pragma once
-#include "../../Platform.h"
+#include "../../HostInitialization.h"

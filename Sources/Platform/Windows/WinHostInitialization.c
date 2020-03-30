@@ -65,3 +65,13 @@ CleanupGdt (
 {
     UNREFERENCED_PARAMETER(OriginalGdtr);
 }
+
+BOOLEAN
+IsVmxAvailableEx (
+    )
+{
+    //
+    // Windows driver implementation does not require anything additionally.
+    //
+    return TRUE;
+}
