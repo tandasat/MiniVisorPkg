@@ -220,3 +220,26 @@ AdjustCr4 (
     newCr4.Flags |= fixed0Cr4.Flags;
     return newCr4;
 }
+
+_Use_decl_annotations_
+BOOLEAN
+IsHypervisorPresent (
+    CONST CHAR* HyperVisorName
+    )
+{
+    int registers[4];   // EAX, EBX, ECX, and EDX
+    char vendorId[13];
+
+    //
+    // When our hypervisor or ones that is compatible with the Hypervisor Top
+    // Level Functional Specification is installed, CPUID leaf 40000000h will
+    // return hypervisor vendor ID signature in EBX, ECX, and EDX.
+    //
+    __cpuid(registers, CPUID_HV_VENDOR_AND_MAX_FUNCTIONS);
+    RtlCopyMemory(vendorId + 0, &registers[1], sizeof(registers[1]));
+    RtlCopyMemory(vendorId + 4, &registers[2], sizeof(registers[2]));
+    RtlCopyMemory(vendorId + 8, &registers[3], sizeof(registers[3]));
+    vendorId[12] = ANSI_NULL;
+
+    return (strcmp(vendorId, HyperVisorName) == 0);
+}

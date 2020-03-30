@@ -84,3 +84,14 @@ CR4
 AdjustCr4 (
     _In_ CR4 Cr4
     );
+
+/*!
+    @brief Tests whether the specified hypervisor is installed on the system.
+
+    @return TRUE when a specified hypervisor is installed on the system; otherwise FALSE.
+ */
+_Must_inspect_result_
+BOOLEAN
+IsHypervisorPresent (
+    _In_ CONST CHAR* HyperVisorName
+    );
