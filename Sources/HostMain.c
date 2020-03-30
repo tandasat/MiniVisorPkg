@@ -185,15 +185,6 @@ HandleCpuid (
             registers[3] = '   r';
             break;
 
-        case CPUID_HV_INTERFACE:
-            //
-            // Return non Hv#1 value. This indicate that the MiniVisor does NOT
-            // conform to the Microsoft hypervisor interface.
-            //
-            registers[0] = '0#vH';  // Hv#0
-            registers[1] = registers[2] = registers[3] = 0;
-            break;
-
         default:
             break;
     }
