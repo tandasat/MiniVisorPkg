@@ -33,6 +33,7 @@ VMCALL_HANDLER HandleVmcallUninstall;
 //
 static VMCALL_HANDLER* k_VmcallHandlers[] =
 {
+    NULL,
     HandleVmcallUninstall,
 };
-C_ASSERT(RTL_NUMBER_OF(k_VmcallHandlers) == VmcallInvalid);
+C_ASSERT(RTL_NUMBER_OF(k_VmcallHandlers) == (MV_VMCALL_INVALID_MAX & MAXUINT32));

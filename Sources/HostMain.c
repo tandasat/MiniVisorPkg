@@ -14,6 +14,8 @@
 #include "ExtendedPageTables.h"
 #include "HostVmcall.h"
 #include "HostNesting.h"
+#include "Asm.h"
+#include "Ia32Utils.h"
 
 //
 // Windows-specific:
@@ -210,6 +212,10 @@ HandleCpuid (
 /*!
     @brief Handles VM-exit due to execution of the VMCALL instruction.
 
+    @details When this hypervisor run on Hyper-V, VMCALLs that are issued for
+        Hyper-V is delivered in this hypervisor. If this appears to be the case,
+        this function re-issue VMCALL so it is forwarded to Hyper-V.
+
     @param[in,out] GuestContext - The pointer to the guest context.
  */
 static
@@ -224,7 +230,37 @@ HandleVmCall (
     // Our hypercall takes the hypercall number in RCX.
     //
     hypercallNumber = GuestContext->StackBasedRegisters->Rcx;
-    if (hypercallNumber >= VmcallInvalid)
+
+    //
+    // This hypercall is not for us if the higher 32bit does not have a signature.
+    //
+    if ((hypercallNumber >> 32) != MV_VMCALL_SIGNATURE_MASK)
+    {
+        //
+        // Let the L0 Hyper-V handle it if it appears to exist. Otherwise, inject
+        // #UD.
+        //
+        if (IsHypervisorPresent("Microsoft Hv") != FALSE)
+        {
+            GuestContext->StackBasedRegisters->Rax = AsmVmxCall(
+                                        GuestContext->StackBasedRegisters->Rcx,
+                                        GuestContext->StackBasedRegisters->Rdx,
+                                        GuestContext->StackBasedRegisters->R8,
+                                        GuestContext->StackBasedRegisters->R9);
+            AdvanceGuestInstructionPointer(GuestContext);
+        }
+        else
+        {
+            InjectInterruption(HardwareException, InvalidOpcode, FALSE, 0);
+        }
+        goto Exit;
+    }
+
+    //
+    // This hypercall may be for us. Check if this is one of accepted numbers.
+    //
+    if ((hypercallNumber <= MV_VMCALL_INVALID_MIN) ||
+        (hypercallNumber >= MV_VMCALL_INVALID_MAX))
     {
         //
         // Undefined hypercall number. Inject #UD.
@@ -236,6 +272,7 @@ HandleVmCall (
     //
     // Executes the corresponding hypercall handler.
     //
+    hypercallNumber &= MAXUINT32;
     k_VmcallHandlers[hypercallNumber](GuestContext);
 
     AdvanceGuestInstructionPointer(GuestContext);
@@ -734,6 +771,27 @@ HandleStartupIpi (
 }
 
 /*!
+    @brief Handles VM-exit due to execution of the HLT instruction.
+
+    @details This hypervisor does not enable HLT exiting and should not receive
+        this VM-exit, unless it is running on Hyper-V. This is a workaround to
+        make this hypervisor work inside the Hyper-V VM.
+
+    @param[in,out] GuestContext - The pointer to the guest context.
+ */
+static
+VOID
+HandleHalt (
+    _Inout_ GUEST_CONTEXT* GuestContext
+    )
+{
+    //
+    // Ignore HLT.
+    //
+    AdvanceGuestInstructionPointer(GuestContext);
+}
+
+/*!
     @brief Handles VM-exit. This is the C-level entry point of the hypervisor.
 
     @details This function is called the actual entry point of hypervisor, the
@@ -825,6 +883,10 @@ HandleVmExit (
 
         case VMX_EXIT_REASON_EXECUTE_CPUID:
             HandleCpuid(&guestContext);
+            break;
+
+        case VMX_EXIT_REASON_EXECUTE_HLT:
+            HandleHalt(&guestContext);
             break;
 
         case VMX_EXIT_REASON_EXECUTE_VMCALL:

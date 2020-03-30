@@ -13,18 +13,11 @@
 //
 // The VMCALL numbers our hypervisor provides.
 //
-typedef enum _HYPERVISOR_VMCALL_NUMBER
-{
-    //
-    // Uninstall the hypervisor.
-    //
-    VmcallUninstall,
+#define MV_VMCALL_SIGNATURE_MASK    (UINT64)('MinV')
 
-    //
-    // The maximum valid VMCALL number (exclusive).
-    //
-    VmcallInvalid,
-} HYPERVISOR_VMCALL_NUMBER;
+#define MV_VMCALL_INVALID_MIN       (UINT64)((MV_VMCALL_SIGNATURE_MASK << 32) | 0)
+#define MV_VMCALL_UNINSTALL         (UINT64)((MV_VMCALL_SIGNATURE_MASK << 32) | 1)
+#define MV_VMCALL_INVALID_MAX       (UINT64)((MV_VMCALL_SIGNATURE_MASK << 32) | 2)
 
 //
 // The arbitrary collection of data passed to our hypervisor from kernel-mode

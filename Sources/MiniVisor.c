@@ -412,7 +412,7 @@ DisableHypervisor (
     // Issues the hypercall to uninstall the hypervisor. This hypercall returns
     // the address of the shared processor context on success.
     //
-    returnedAddress = (SHARED_PROCESSOR_CONTEXT*)AsmVmxCall(VmcallUninstall, 0, 0, 0);
+    returnedAddress = (SHARED_PROCESSOR_CONTEXT*)AsmVmxCall(MV_VMCALL_UNINSTALL, 0, 0, 0);
     MV_ASSERT(returnedAddress != NULL);
 
     //
