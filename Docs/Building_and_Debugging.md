@@ -324,16 +324,25 @@ VMware Workstation is the only supported virtualization platform. However, one c
 
     Pros:
     * No software cost.
-    * Possible to inspect the system even on an unhandled exception. This is not possible with VMware Workstation as it terminates immediately.
     * Functional with a single processor configuration.
+    * Possible to inspect the system even on an unhandled exception. This is not possible with VMware Workstation as it terminates immediately.
 
     Cons:
-    * Unable to test multi-processor configurations. Boot hangs once VMXON is executed on an application processor.
+    * Unable to test multi-processor configurations. APs hang during startup of the operating system. (Pretty please let me know if anyone knows what the real issue is.)
     * A Linux host is required.
 
 * Hyper-V
 
-    Hardly usable due to lack of multi-processor protocol support and underneath Hyper-V forwarding VM-exit despite those are not enabled.
+    This is yet another alternative and can be the easiest way to try out the UEFI hypervisor on Windows systems. The detailed instructions to test on Hyper-V is documented in [Testing UEFI on Hyper-V](Testing_UEFI_on_Hyper-V.md).
+
+    Pros:
+    * No software cost.
+    * Functional with a single processor configuration.
+    * Intel UDK mentioned above works and is useful to some extent.
+
+    Cons:
+    * Unable to test multi-processor configurations.
+    * No emulation of hardware debugger (ie, GDB debugging).
 
 * VirtualBox
 
@@ -345,7 +354,7 @@ VMware Workstation is the only supported virtualization platform. However, one c
 
 * Bochs
 
-    Not usable due to lack of UEFI support.
+    Not usable due to lack of UEFI support. Note that the traditional bootloader that loads MiniVisor could be written to work around this.
 
 UEFI: Testing with Single-board Computers
 ------------------------------------------
