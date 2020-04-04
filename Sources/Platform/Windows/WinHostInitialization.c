@@ -44,6 +44,7 @@ GetHostIdtr (
     return &g_HostIdtr;
 }
 
+_Use_decl_annotations_
 VOID
 InitializeGdt (
     TASK_STATE_SEGMENT_64* NewTss,
@@ -55,9 +56,11 @@ InitializeGdt (
     UNREFERENCED_PARAMETER(NewTss);
     UNREFERENCED_PARAMETER(NewGdt);
     UNREFERENCED_PARAMETER(NewGdtSize);
-    UNREFERENCED_PARAMETER(OriginalGdtr);
+
+    RtlZeroMemory(OriginalGdtr, sizeof(*OriginalGdtr));
 }
 
+_Use_decl_annotations_
 VOID
 CleanupGdt (
     CONST GDTR* OriginalGdtr

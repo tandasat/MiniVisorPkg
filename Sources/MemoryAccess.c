@@ -552,7 +552,6 @@ ReadOrWriteGuestVirtualAddress (
 {
     BOOLEAN successful;
     UINT64 physicalAddress;
-    VOID* failedVa;
     UINT64 guestVaToOperate;
     UINT8* currentBuffer;
     UINT64 remainingBytesToCopy;
@@ -577,7 +576,6 @@ ReadOrWriteGuestVirtualAddress (
     // As this lets the guest to execute the #PF handler and there is a relatively
     // larger window that allows other core to modify the 2nd page meanwhile.
     //
-    failedVa = NULL;
     currentBuffer = Buffer;
     guestVaToOperate = GuestVirtualAddress;
     remainingBytesToCopy = BytesToCopy;

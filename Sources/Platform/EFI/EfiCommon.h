@@ -38,11 +38,14 @@
 #define MV_ASSERT(x)
 #else
 #define MV_ASSERT(x) \
-    if (!(x)) \
+    do \
     { \
-        LOG_ERROR("ASSERT %a(%d): %a", __FILE__, __LINE__, #x); \
-        MV_PANIC(); \
-    } (VOID*)NULL
+        if (!(x)) \
+        { \
+            LOG_ERROR("ASSERT %a(%d): %a", __FILE__, __LINE__, #x); \
+            MV_PANIC(); \
+        } \
+    } while (FALSE)
 #endif
 
 #if defined(MDEPKG_NDEBUG)
@@ -59,6 +62,9 @@
 //
 typedef CHAR8 CHAR;
 typedef CHAR16 WCHAR;
+#if !defined(_MSC_VER)
+#define __int64 long long
+#endif
 
 //
 // MSVC intrinsics.
@@ -99,6 +105,7 @@ void _enable(void);
 void _lgdt(void *);
 void _sgdt(void *);
 void _xsetbv(unsigned int, unsigned __int64);
+unsigned char _BitScanForward64(unsigned long *, unsigned __int64);
 
 //
 // Required. Otherwise, link error occurs.
@@ -148,7 +155,6 @@ void _xsetbv(unsigned int, unsigned __int64);
 #define C_ASSERT(x)                     STATIC_ASSERT(x, #x)
 #define ClearFlag(_F,_SF)               ((_F) &= ~(_SF))
 #define DBG_UNREFERENCED_PARAMETER(x)
-#define DECLSPEC_ALIGN(x)               __declspec(align(x))
 #define FlagOn(_F,_SF)                  ((_F) & (_SF))
 #define KERNEL_STACK_SIZE               (0x6000)
 #define MAXUINT16                       MAX_UINT16
@@ -165,3 +171,8 @@ void _xsetbv(unsigned int, unsigned __int64);
 #define SetFlag(_F,_SF)                 ((_F) |= (_SF))
 #define strcmp(x, y)                    AsciiStrCmp((x), (y))
 #define UNREFERENCED_PARAMETER(x)
+#if defined(_MSC_VER)
+#define DECLSPEC_ALIGN(x)               __declspec(align(x))
+#elif defined(__GNUC__)
+#define DECLSPEC_ALIGN(x)               __attribute__ ((aligned(x)))
+#endif

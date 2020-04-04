@@ -46,7 +46,7 @@ typedef enum _LOG_LEVEL
     @param[in] Format - The format string.
  */
 #define LOG_EARLY_ERROR(Format, ...) \
-    LogEarlyErrorMessage(Format ## "\n", __VA_ARGS__)
+    LogEarlyErrorMessage(Format "\n", ## __VA_ARGS__)
 
 /*!
     @brief Logs the error-level message.
@@ -54,7 +54,7 @@ typedef enum _LOG_LEVEL
     @param[in] Format - The format string.
  */
 #define LOG_ERROR(Format, ...) \
-    LogMessage(LogLevelError, __FUNCTION__, (Format), __VA_ARGS__)
+    LogMessage(LogLevelError, __FUNCTION__, (Format), ## __VA_ARGS__)
 
 /*!
     @brief Logs the warning-level message.
@@ -62,7 +62,7 @@ typedef enum _LOG_LEVEL
     @param[in] Format - The format string.
  */
 #define LOG_WARNING(Format, ...) \
-    LogMessage(LogLevelWarning, __FUNCTION__, (Format), __VA_ARGS__)
+    LogMessage(LogLevelWarning, __FUNCTION__, (Format), ## __VA_ARGS__)
 
 /*!
     @brief Logs the information-level message.
@@ -70,7 +70,7 @@ typedef enum _LOG_LEVEL
     @param[in] Format - The format string.
  */
 #define LOG_INFO(Format, ...) \
-    LogMessage(LogLevelInfo, __FUNCTION__, (Format), __VA_ARGS__)
+    LogMessage(LogLevelInfo, __FUNCTION__, (Format), ## __VA_ARGS__)
 
 /*!
     @brief Logs the debug-level message.
@@ -78,7 +78,7 @@ typedef enum _LOG_LEVEL
     @param[in] Format - The format string.
  */
 #define LOG_DEBUG(Format, ...) \
-    LogMessage(LogLevelDebug, __FUNCTION__, (Format), __VA_ARGS__)
+    LogMessage(LogLevelDebug, __FUNCTION__, (Format), ## __VA_ARGS__)
 
 /*!
     @brief Logs the log message.

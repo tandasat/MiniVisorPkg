@@ -117,7 +117,6 @@ BuildEptEntriesFor512Gb (
     _In_ UINT32 EptPml4Index
     )
 {
-    static CONST UINT64 oneGigaByte = (1 * 1024 * 1024 * 1024);
     static CONST UINT64 twoMegaByte = (2 * 1024 * 1024);
 
     MV_STATUS status;

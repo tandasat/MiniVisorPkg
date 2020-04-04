@@ -209,7 +209,7 @@ InitializePlatform (
     //
     status = gBS->LocateProtocol(&gEfiMpServiceProtocolGuid,
                                  NULL,
-                                 &g_MpServices);
+                                 (void**)&g_MpServices);
     if (EFI_ERROR(status))
     {
         LOG_ERROR("LocateProtocol failed : %r", status);
@@ -384,7 +384,7 @@ RunOnAllProcessors (
     }
 
     status = g_MpServices->StartupAllAPs(g_MpServices,
-                                         Callback,
+                                         (EFI_AP_PROCEDURE)Callback,
                                          TRUE,
                                          NULL,
                                          0,
