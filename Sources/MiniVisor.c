@@ -1194,7 +1194,7 @@ InitializeMsrBitmaps (
 
     RtlZeroMemory(Bitmaps, sizeof(*Bitmaps));
 
-    for (int i = 0; i < RTL_NUMBER_OF(registrations); ++i)
+    for (UINT64 i = 0; i < RTL_NUMBER_OF(registrations); ++i)
     {
         UpdateMsrBitmaps(Bitmaps,
                          registrations[i].Msr,

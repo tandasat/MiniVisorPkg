@@ -65,7 +65,6 @@
 
 [Guids]
   gEfiEventExitBootServicesGuid                    ## CONSUMES
-  gEfiEventVirtualAddressChangeGuid                ## CONSUMES
 
 [Depex]
   TRUE
@@ -87,6 +86,9 @@
   # for example, to reconstruct stack trace. Leave it for such cases. See also,
   # https://edk2-docs.gitbooks.io/edk-ii-basetools-user-guides/content/GenFw.html
   MSFT:*_*_X64_GENFW_FLAGS = --keepexceptiontable --keepzeropending --keepoptionalheader
+
+  # gcc and clang is not supported but this let us run additional code analysis.
+  GCC:*_*_*_CC_FLAGS = -Wall -Wextra -Wno-unknown-pragmas -Wno-multichar -Wno-unused-function -Wno-unused-value -Wno-unused-parameter
 
   # Finally, note that the RELEASE build will generate excessively large binary
   # file. To avoid this open the Conf/tools_def.txt, locate the below line,

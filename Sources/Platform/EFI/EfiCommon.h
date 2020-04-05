@@ -170,7 +170,7 @@ unsigned char _BitScanForward64(unsigned long *, unsigned __int64);
 #define RtlZeroMemory                   ZeroMem
 #define SetFlag(_F,_SF)                 ((_F) |= (_SF))
 #define strcmp(x, y)                    AsciiStrCmp((x), (y))
-#define UNREFERENCED_PARAMETER(x)
+#define UNREFERENCED_PARAMETER(x)       (void)(x)
 #if defined(_MSC_VER)
 #define DECLSPEC_ALIGN(x)               __declspec(align(x))
 #elif defined(__GNUC__)
