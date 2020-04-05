@@ -45,15 +45,16 @@
   <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   <PropertyGroup Label="UserMacros">
     <Edk2Dir>$(SolutionDir)..\..\</Edk2Dir>
+    <Ia32DocDir>$(SolutionDir)..\Externals\ia32-doc\</Ia32DocDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'!='UEFI'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
-    <IncludePath>$(VC_IncludePath);$(IncludePath)</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(IncludePath);$(Ia32DocDir)out;</IncludePath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='UEFI'">
-    <IncludePath>$(SolutionDir)Include;$(Edk2Dir)MdePkg\Include;$(Edk2Dir)MdePkg\Include\X64</IncludePath>
+    <IncludePath>$(Ia32DocDir)out;$(Edk2Dir)MdePkg\Include;$(Edk2Dir)MdePkg\Include\X64</IncludePath>
     <LibraryPath>$(SolutionDir)Libs</LibraryPath>
     <TargetExt>.efi</TargetExt>
     <TargetName>$(ProjectName)Dxe</TargetName>

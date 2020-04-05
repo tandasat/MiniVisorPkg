@@ -19,25 +19,12 @@
 //
 #pragma warning(push)
 #pragma warning(disable: 4201)
-#include "ia32-doc/out/ia32.h"
+#include <ia32.h>
 #pragma warning(pop)
 
 #if !defined(CHAR_BIT)
 #define CHAR_BIT (8)
 #endif
-
-//
-// The entry count within an EPT page table.
-//
-#define EPT_PTE_ENTRY_COUNT 512
-
-//
-// The entry counts within paging structures.
-//
-#define PML4_ENTRY_COUNT    512
-#define PDPT_ENTRY_COUNT    512
-#define PDT_ENTRY_COUNT     512
-#define PT_ENTRY_COUNT      512
 
 //
 // The entry count within the IDT.
@@ -76,6 +63,8 @@ typedef union _IA32_MTRR_FIXED_RANGE_MSR
 
 //
 // See: Table 11-10. Memory Ranges That Can Be Encoded With PAT
+//
+// Find MEMORY_TYPE_* for possible values.
 //
 typedef UINT32 IA32_MEMORY_TYPE;
 
@@ -163,8 +152,3 @@ typedef struct _MSR_BITMAPS
     UINT8 WriteBitmapHigh[1024];
 } MSR_BITMAPS;
 C_ASSERT(sizeof(MSR_BITMAPS) == PAGE_SIZE);
-
-//
-// ia32.h does not include a EXCEPTION_VECTOR definition for NMI. Add this.
-//
-#define Nmi     (EXCEPTION_VECTOR)2

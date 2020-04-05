@@ -1187,7 +1187,7 @@ InitializeMsrBitmaps (
 
     static CONST INTERCEPT_MSR_REGISTRATION registrations[] =
     {
-        { IA32_BIOS_SIGN_ID, OperationRead, },
+        { IA32_BIOS_UPDATE_SIGNATURE, OperationRead, },
     };
 
     PAGED_CODE();

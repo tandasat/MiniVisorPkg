@@ -60,19 +60,19 @@ typedef struct _PAGING_STRUCTURES
     //
     // There is only one PML4, unless 5-level page mapping is enabled.
     //
-    DECLSPEC_ALIGN(PAGE_SIZE) PML4E_64 Pml4[PML4_ENTRY_COUNT];
+    DECLSPEC_ALIGN(PAGE_SIZE) PML4E_64 Pml4[PML4E_ENTRY_COUNT_64];
 
     //
     // Only one PDPT is used for PML4[0]. This covers 512GB of the physical memory
     // range and is sufficient for our purpose.
     //
-    DECLSPEC_ALIGN(PAGE_SIZE) PDPTE_64 Pdpt[1][PDPT_ENTRY_COUNT];
+    DECLSPEC_ALIGN(PAGE_SIZE) PDPTE_64 Pdpt[1][PDPTE_ENTRY_COUNT_64];
 
     //
     // PDs are assigned for each PDPT entry, meaning that 512 (PDPTEs) multiplied
     // by the PDT entry count.
     //
-    DECLSPEC_ALIGN(PAGE_SIZE) PDE_2MB_64 Pdt[1][PDPT_ENTRY_COUNT][PDT_ENTRY_COUNT];
+    DECLSPEC_ALIGN(PAGE_SIZE) PDE_2MB_64 Pdt[1][PDPTE_ENTRY_COUNT_64][PDE_ENTRY_COUNT_64];
 } PAGING_STRUCTURES;
 
 //
@@ -123,7 +123,7 @@ InitializeHostPagingStructures (
     pml4[0].Write = TRUE;
     pml4[0].PageFrameNumber = GetPhysicalAddress(pdpt) >> PAGE_SHIFT;
 
-    for (UINT32 pdptIndex = 0; pdptIndex < PDPT_ENTRY_COUNT; ++pdptIndex)
+    for (UINT32 pdptIndex = 0; pdptIndex < PDPTE_ENTRY_COUNT_64; ++pdptIndex)
     {
         pdt = g_HostPagingStructures.Pdt[pml4Index][pdptIndex];
 
@@ -131,7 +131,7 @@ InitializeHostPagingStructures (
         pdpt[pdptIndex].Write = TRUE;
         pdpt[pdptIndex].PageFrameNumber = GetPhysicalAddress(pdt) >> PAGE_SHIFT;
 
-        for (UINT32 pdIndex = 0; pdIndex < PDT_ENTRY_COUNT; ++pdIndex)
+        for (UINT32 pdIndex = 0; pdIndex < PDE_ENTRY_COUNT_64; ++pdIndex)
         {
             UINT64 physicalAddress;
 

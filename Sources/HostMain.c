@@ -76,7 +76,7 @@ HandleMsrAccess (
     {
         switch (msr)
         {
-        case IA32_BIOS_SIGN_ID:
+        case IA32_BIOS_UPDATE_SIGNATURE:
             //
             // Linux reads this MSR during boot and may attempt to update BIOS
             // microcode. Returning the greater value than the value the kernel

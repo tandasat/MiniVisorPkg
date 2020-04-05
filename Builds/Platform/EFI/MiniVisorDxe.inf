@@ -45,7 +45,7 @@
   ../../../Sources/Asm.asm
   ../../../Sources/Asm.h
   ../../../Sources/Common.h
-  ../../../Sources/ia32-doc/out/ia32.h
+  ../../../Externals/ia32-doc/out/ia32.h
 
 [Packages]
   MdePkg/MdePkg.dec
