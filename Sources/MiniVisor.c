@@ -821,9 +821,13 @@ SetupVmcs (
 
     //
     // The pin-based VM-execution controls governs the handling of asynchronous
-    // events (for example: interrupts). We do not need any of them.
+    // events (for example: interrupts). We need to enable those two NMI related
+    // flags in order to use NMI-window exiting, which is required to inject NMI
+    // occurs during execution of the host.
     //
     pinBasedControls.Flags = 0;
+    pinBasedControls.NmiExiting = TRUE;
+    pinBasedControls.VirtualNmi = TRUE;
     AdjustPinBasedControls(&pinBasedControls);
 
     //

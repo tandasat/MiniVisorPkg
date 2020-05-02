@@ -531,3 +531,16 @@ UpdateMsrBitmaps (
         ClearFlag(msrBitmap[byteOffset], bitMask);
     }
 }
+
+_Use_decl_annotations_
+VOID
+SetNmiWindowExiting (
+    BOOLEAN Enable
+    )
+{
+    IA32_VMX_PROCBASED_CTLS_REGISTER primaryProcBasedControls;
+
+    primaryProcBasedControls.Flags = VmxRead(VMCS_CTRL_PROCESSOR_BASED_VM_EXECUTION_CONTROLS);
+    primaryProcBasedControls.NmiWindowExiting = Enable;
+    VmxWrite(VMCS_CTRL_PROCESSOR_BASED_VM_EXECUTION_CONTROLS, primaryProcBasedControls.Flags);
+}

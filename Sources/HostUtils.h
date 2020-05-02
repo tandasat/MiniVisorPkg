@@ -252,3 +252,13 @@ UpdateMsrBitmaps (
     _In_ OPERATION_TYPE InterOperation,
     _In_ BOOLEAN Intercept
     );
+
+/*!
+    @brief Enables or disables NMI window exiting.
+
+    @param[in] Enable - Whether NMI window exiting should be enabled.
+ */
+VOID
+SetNmiWindowExiting (
+    _In_ BOOLEAN Enable
+    );

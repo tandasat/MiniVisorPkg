@@ -494,6 +494,15 @@ HandleExceptionOrNmi (
 
     switch (interruptInfo.Vector)
     {
+    case Nmi:
+        MV_ASSERT(interruptInfo.InterruptionType == NonMaskableInterrupt);
+
+        //
+        // Enable NMI-window exiting to inject NMI whenever it becomes possible.
+        //
+        SetNmiWindowExiting(TRUE);
+        break;
+
     case DivideError:
         MV_ASSERT(interruptInfo.InterruptionType == HardwareException);
 
@@ -762,6 +771,28 @@ HandleStartupIpi (
 }
 
 /*!
+    @brief Handles VM-exit due to NMI window exit.
+
+    @details This injects NMI to the guest based on the assumption that observing
+        NMI-window exiting means the host received NMI either during the root mode
+        via IDT or non-root mode via VM-exit, and the host enabled NMI-window
+        exiting without injecting NMI at that time.
+
+    @param[in,out] GuestContext - The pointer to the guest context.
+ */
+static
+VOID
+HandleNmiWindow (
+    _Inout_ GUEST_CONTEXT* GuestContext
+    )
+{
+    UNREFERENCED_PARAMETER(GuestContext);
+
+    SetNmiWindowExiting(FALSE);
+    InjectInterruption(NonMaskableInterrupt, Nmi, FALSE, 0);
+}
+
+/*!
     @brief Handles VM-exit due to execution of the HLT instruction.
 
     @details This hypervisor does not enable HLT exiting and should not receive
@@ -872,6 +903,10 @@ HandleVmExit (
             HandleStartupIpi(&guestContext);
             break;
 
+        case VMX_EXIT_REASON_NMI_WINDOW:
+            HandleNmiWindow(&guestContext);
+            break;
+
         case VMX_EXIT_REASON_EXECUTE_CPUID:
             HandleCpuid(&guestContext);
             break;
@@ -977,11 +1012,12 @@ HandleHostException (
     )
 {
     //
-    // Drop NMI occurred during the VMX root mode. This implementation is
-    // incomplete, and NMI should be injected to the guest.
+    // Enable NMI-window exiting if NMI occurred during VMX root mode so that
+    // we can re-inject it when possible.
     //
     if (Stack->InterruptNumber == Nmi)
     {
+        SetNmiWindowExiting(TRUE);
         return;
     }
 
