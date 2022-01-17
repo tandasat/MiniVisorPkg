@@ -36,9 +36,8 @@ The below instructions are all to be done on the host system.
     2. Cloning the EDK2 repository,
         ```
         > cd C:\
-        > git clone https://github.com/tianocore/edk2.git
+        > git clone -b edk2-stable202111 --recurse-submodules https://github.com/tianocore/edk2
         > cd edk2
-        > git submodule update --init
         ```
     3. Editing Conf\target.txt, and
         ```
