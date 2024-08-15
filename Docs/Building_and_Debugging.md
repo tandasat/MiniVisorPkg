@@ -7,7 +7,7 @@ Common Build Prerequisites
 ---------------------------
 
 To build MiniVisor, the followings are required.
-* [Visual Studio Community 2019](https://www.visualstudio.com/downloads/)
+* [Visual Studio](https://www.visualstudio.com/downloads/) Community 2019 or 2022
 * [Windows Software Development Kit (SDK) for Windows 10](https://developer.microsoft.*om/en-us/windows/downloads/windows-10-sdk) 10.0.18362 or later
 * [Windows Driver Kit (WDK) for Windows 10](https://developer.microsoft.com/en-us/windows/hardware/windows-driver-kit) 10.0.18362 or later
 
@@ -418,4 +418,4 @@ Similarly, the below command will unload the driver.
 Windows: Debugging the Driver with a Debugger
 ----------------------------------------------
 
-The Windows driver can be debugged in the same way as other Windows drivers. Configure KDNET for Windows 10 and KDCOM for Windows 7, and attach WinDbg as usual.
+The Windows driver can be debugged in the same way as other Windows drivers. Configure KDNET for Windows 10 and attach WinDbg as usual.

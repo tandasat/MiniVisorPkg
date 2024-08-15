@@ -114,20 +114,6 @@ DriverEntry (
     DriverObject->DriverUnload = DriverUnload;
 
     //
-    // Opts-in no-execute (NX) non-paged pool for security when available.
-    //
-    // By defining POOL_NX_OPTIN as 1 and calling this function, non-paged pool
-    // allocation by the ExAllocatePool family with the NonPagedPool flag
-    // automatically allocates NX non-paged pool on Windows 8 and later versions
-    // of Windows, while on Windows 7 where NX non-paged pool is unsupported,
-    // executable non-paged pool is returned as usual. The merit of this is that
-    // the NonPagedPoolNx flag does not have to be used. Since the flag is
-    // unsupported on Windows 7, being able to stick with the NonPagedPool flag
-    // help keep code concise.
-    //
-    ExInitializeDriverRuntime(DrvRtPoolNxOptIn);
-
-    //
     // Start cross-platform initialization.
     //
     return ConvertMvToNtStatus(InitializeMiniVisor());
@@ -259,14 +245,7 @@ AllocateSystemMemory (
     MV_ASSERT(PageCount > 0);
 
     allocationBytes = (SIZE_T)PageCount * PAGE_SIZE;
-
-    //
-    // This is bogus.
-    // "The current function is permitted to run at an IRQ level above the
-    //  maximum permitted for 'ExAllocatePoolWithTag' (1)."
-    //
-#pragma warning(suppress: 28118)
-    pages = ExAllocatePoolWithTag(NonPagedPool, allocationBytes, MV_POOL_TAG);
+    pages = ExAllocatePool2(POOL_FLAG_NON_PAGED, allocationBytes, MV_POOL_TAG);
     if (pages == NULL)
     {
         goto Exit;

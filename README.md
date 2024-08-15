@@ -39,7 +39,7 @@ Requirements for the UEFI driver:
 * 64bit Windows 10, IoT Core, or Ubuntu to boot
 
 Requirements for the Windows driver:
-* 64bit Windows 7 and 10
+* 64bit Windows 10
 
 See [Building and Debugging](Docs/Building_and_Debugging.md) for testing.
 

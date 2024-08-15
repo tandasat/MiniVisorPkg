@@ -510,8 +510,8 @@ InitializePairedLogBuffer (
     //
     // Create paired log buffer.
     //
-    logEntries1 = ExAllocatePoolWithTag(NonPagedPool, BufferSize, LOGGER_POOL_TAG);
-    logEntries2 = ExAllocatePoolWithTag(NonPagedPool, BufferSize, LOGGER_POOL_TAG);
+    logEntries1 = ExAllocatePool2(POOL_FLAG_NON_PAGED, BufferSize, LOGGER_POOL_TAG);
+    logEntries2 = ExAllocatePool2(POOL_FLAG_NON_PAGED, BufferSize, LOGGER_POOL_TAG);
     if ((logEntries1 == NULL) || (logEntries2 == NULL))
     {
         status = STATUS_INSUFFICIENT_RESOURCES;
@@ -634,7 +634,7 @@ InitializeLogger (
     // Create the logger instance.
     //
 #pragma prefast(suppress: __WARNING_MEMORY_LEAK, "Ownership taken on success.")
-    logger = ExAllocatePoolWithTag(NonPagedPool, sizeof(*logger), LOGGER_POOL_TAG);
+    logger = ExAllocatePool2(POOL_FLAG_NON_PAGED, sizeof(*logger), LOGGER_POOL_TAG);
     if (logger == NULL)
     {
         DbgPrintEx(DPFLTR_IHVDRIVER_ID,
