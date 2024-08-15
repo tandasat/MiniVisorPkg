@@ -185,6 +185,17 @@ HandleCpuid (
             registers[3] = '   r';
             break;
 
+        case CPUID_HV_INTERFACE:
+            // Return non "Hv#1" into EAX. This indicate that our hypervisor does NOT
+            // conform to the Microsoft hypervisor interface. This prevents the guest
+            // from using the interface for optimum performance, but simplifies
+            // implementation of our hypervisor. This is required only when testing
+            // in the virtualization platform that supports the Microsoft hypervisor
+            // interface, such as VMware, and not required for a baremetal.
+            // See: Hypervisor Top Level Functional Specification
+            registers[0] = 0;
+            break;
+
         default:
             break;
     }
